@@ -53,6 +53,15 @@ export const translations = {
       Orange: 'Orange', Purple: 'Purple', Pink: 'Pink', Brown: 'Brown',
       Black: 'Black', White: 'White'
     },
+    memoryMatch: 'Memory Match',
+    memoryMoves: (n) => `${n} moves`,
+    memoryPerfect: 'Perfect memory! 🧠',
+    memoryGreat: 'Great memory!',
+    memoryGood: 'Good try! Practice more!',
+    memoryMatchDesc: 'Find matching color pairs!',
+    shapeChallengeDesc: 'Speed shape challenge with timer!',
+    findShape: 'Find this shape:',
+    streakLabel: 'streak!',
     shapes: {
       Circle: 'Circle', Square: 'Square', Triangle: 'Triangle', Rectangle: 'Rectangle',
       Star: 'Star', Heart: 'Heart', Diamond: 'Diamond', Oval: 'Oval'
@@ -112,6 +121,15 @@ export const translations = {
       Orange: 'نارنجی', Purple: 'جامنی', Pink: 'گلابی', Brown: 'بھورا',
       Black: 'کالا', White: 'سفید'
     },
+    memoryMatch: 'یادداشت کا کھیل',
+    memoryMoves: (n) => `${n} چالیں`,
+    memoryPerfect: '🧠 !کمال کی یادداشت',
+    memoryGreat: '!شاندار یادداشت',
+    memoryGood: '!اچھی کوشش! مزید مشق کریں',
+    memoryMatchDesc: '!رنگوں کے جوڑے تلاش کریں',
+    shapeChallengeDesc: '!ٹائمر کے ساتھ شکلوں کا چیلنج',
+    findShape: ':یہ شکل تلاش کریں',
+    streakLabel: '!لگاتار',
     shapes: {
       Circle: 'دائرہ', Square: 'مربع', Triangle: 'مثلث', Rectangle: 'مستطیل',
       Star: 'ستارہ', Heart: 'دل', Diamond: 'ہیرا', Oval: 'بیضوی'
@@ -171,6 +189,15 @@ export const translations = {
       Orange: 'नारंगी', Purple: 'बैंगनी', Pink: 'गुलाबी', Brown: 'भूरा',
       Black: 'काला', White: 'सफ़ेद'
     },
+    memoryMatch: 'मेमोरी मैच',
+    memoryMoves: (n) => `${n} चालें`,
+    memoryPerfect: '🧠 बेहतरीन याददाश्त!',
+    memoryGreat: 'शानदार याददाश्त!',
+    memoryGood: 'अच्छी कोशिश! और अभ्यास करो!',
+    memoryMatchDesc: 'रंगों के जोड़े खोजो!',
+    shapeChallengeDesc: 'टाइमर के साथ आकार चुनौती!',
+    findShape: 'यह आकार खोजो:',
+    streakLabel: 'लगातार!',
     shapes: {
       Circle: 'गोला', Square: 'वर्ग', Triangle: 'त्रिकोण', Rectangle: 'आयत',
       Star: 'तारा', Heart: 'दिल', Diamond: 'हीरा', Oval: 'अंडाकार'
