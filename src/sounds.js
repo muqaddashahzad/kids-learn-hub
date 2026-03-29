@@ -89,6 +89,55 @@ function speak(text, lang = 'en', rate = 0.85) {
   } catch(e) { console.log('Speech error:', e) }
 }
 
+// Speak a prompt to the child - "Choose [name]!" before they tap
+// Returns a promise that resolves when speech finishes (or after timeout)
+export function speakPrompt(name, lang = 'en') {
+  return new Promise((resolve) => {
+    try {
+      window.speechSynthesis.cancel()
+      const phrases = {
+        en: `Choose ${name}`,
+        ur: `${name} چنیں`,
+        hi: `${name} चुनो`,
+      }
+      const text = phrases[lang] || phrases.en
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(text)
+        const voiceLang = LANG_VOICE[lang] || 'en-US'
+        utterance.lang = voiceLang
+        utterance.rate = 0.8 // slower for kids to hear clearly
+        utterance.pitch = 1.2
+        utterance.volume = 0.9
+        const voice = getBestVoice(voiceLang)
+        if (voice) utterance.voice = voice
+        utterance.onend = () => resolve()
+        utterance.onerror = () => resolve()
+        // Safety timeout in case onend never fires
+        setTimeout(resolve, 3000)
+        window.speechSynthesis.speak(utterance)
+      }, 50)
+    } catch(e) { resolve() }
+  })
+}
+
+// Speak just the name of a color/shape clearly (used after answer in medium/hard)
+export function speakName(name, lang = 'en') {
+  try {
+    window.speechSynthesis.cancel()
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(name)
+      const voiceLang = LANG_VOICE[lang] || 'en-US'
+      utterance.lang = voiceLang
+      utterance.rate = 0.8
+      utterance.pitch = 1.2
+      utterance.volume = 0.9
+      const voice = getBestVoice(voiceLang)
+      if (voice) utterance.voice = voice
+      window.speechSynthesis.speak(utterance)
+    }, 50)
+  } catch(e) {}
+}
+
 // Play a single clean tone (helper)
 function playTone(freq, startTime, duration, volume = 0.12, type = 'sine') {
   const ctx = getCtx()

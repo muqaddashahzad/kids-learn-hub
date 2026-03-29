@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useLanguage } from '../LanguageContext'
-import { playCorrectSound, playWrongSound, playLevelUpSound, playPopSound, playCountdownBeep } from '../sounds'
+import { playCorrectSound, playWrongSound, playLevelUpSound, playPopSound, playCountdownBeep, speakPrompt, speakName } from '../sounds'
 
 const COLORS = [
   { name: 'Red', hex: '#FF4444' },
@@ -35,7 +35,7 @@ function getOptions(correct, all, count = 4) {
 
 function createColorQueue() { return shuffle([...COLORS]) }
 
-// ============ EASY MODE: Classic color quiz ============
+// ============ EASY MODE: Voice says "Choose [color]" BEFORE child taps ============
 function EasyMode({ onBack, t, lang }) {
   const [round, setRound] = useState(1)
   const [score, setScore] = useState(0)
@@ -43,8 +43,9 @@ function EasyMode({ onBack, t, lang }) {
   const [options, setOptions] = useState([])
   const [feedback, setFeedback] = useState('')
   const [selected, setSelected] = useState(null)
-  const [disabled, setDisabled] = useState(false)
+  const [disabled, setDisabled] = useState(true) // start disabled until voice finishes
   const [gameOver, setGameOver] = useState(false)
+  const [speaking, setSpeaking] = useState(false) // shows "listening" indicator
   const colorQueue = useRef([])
 
   const getNextColor = useCallback(() => {
@@ -52,14 +53,18 @@ function EasyMode({ onBack, t, lang }) {
     return colorQueue.current.pop()
   }, [])
 
-  const newRound = useCallback(() => {
+  const newRound = useCallback(async () => {
     const color = getNextColor()
     setCurrentColor(color)
     setOptions(getOptions(color, COLORS, 2))
-    setFeedback(''); setSelected(null); setDisabled(false)
-  }, [getNextColor])
+    setFeedback(''); setSelected(null); setDisabled(true); setSpeaking(true)
+    // Voice says "Choose [color name]" BEFORE enabling buttons
+    await speakPrompt(t.colors[color.name], lang)
+    setSpeaking(false)
+    setDisabled(false)
+  }, [getNextColor, t, lang])
 
-  useEffect(() => { newRound() }, [newRound])
+  useEffect(() => { newRound() }, []) // only run once on mount
 
   const handleAnswer = (opt) => {
     if (disabled) return
@@ -77,10 +82,9 @@ function EasyMode({ onBack, t, lang }) {
         setGameOver(true)
         playLevelUpSound(lang)
       } else { setRound(r => r + 1); newRound() }
-    }, 1200)
+    }, 1500)
   }
 
-  // Game over screen
   if (gameOver) {
     const finalScore = score
     const emoji = finalScore >= 8 ? '🏆' : finalScore >= 5 ? '⭐' : '💪'
@@ -107,6 +111,19 @@ function EasyMode({ onBack, t, lang }) {
     <>
       <div className="round-info">{t.roundXofY(round, ROUNDS_PER_LEVEL)}</div>
       <div style={{ textAlign: 'center', fontSize: '0.9rem', color: '#4CAF50', fontWeight: '600' }}>⭐ {score}</div>
+      
+      {/* Voice prompt indicator */}
+      {speaking && (
+        <div style={{
+          textAlign: 'center', padding: '8px', margin: '4px 12px',
+          background: 'linear-gradient(135deg, #e3f2fd, #bbdefb)', borderRadius: '12px',
+          fontSize: '1.1rem', fontWeight: '600', color: '#1565C0',
+          animation: 'pulse 1s ease-in-out infinite',
+        }}>
+          🔊 {t.choosePrompt ? t.choosePrompt(t.colors[currentColor?.name]) : `Choose ${t.colors[currentColor?.name]}!`}
+        </div>
+      )}
+      
       <div className="display-area">
         {currentColor && (
           <div className="color-circle" style={{
@@ -127,7 +144,8 @@ function EasyMode({ onBack, t, lang }) {
                 backgroundColor: opt.hex, color: COLOR_TEXT[opt.name] || '#FFFFFF',
                 border: opt.name === 'White' ? '3px solid #ccc' : isCorrect ? '3px solid #28a745' : isWrong ? '3px solid #ff3333' : '3px solid transparent',
                 minHeight: '70px', borderRadius: '16px', fontSize: '1.3rem', fontWeight: '700',
-                cursor: 'pointer', transition: 'all 0.2s',
+                cursor: disabled ? 'default' : 'pointer', transition: 'all 0.2s',
+                opacity: disabled && !isSelected ? 0.6 : 1,
                 textShadow: (COLOR_TEXT[opt.name] || '#FFFFFF') === '#FFFFFF' ? '1px 1px 2px rgba(0,0,0,0.3)' : 'none',
               }}
               onClick={() => handleAnswer(opt)}
@@ -516,7 +534,7 @@ export default function LearnColors({ onBack }) {
   const [diffLevel, setDiffLevel] = useState(null)
 
   const DIFFICULTIES = [
-    { key: 'easy', label: '🟢', emoji: '🎨', desc: t.colorDesc || 'Tap the right color name!' },
+    { key: 'easy', label: '🟢', emoji: '🔊', desc: t.easyColorDesc || 'Voice guides you! Hear the color, then tap it.' },
     { key: 'medium', label: '🟡', emoji: '🎈', desc: t.popColorsDesc || 'Pop the right color balloons!' },
     { key: 'hard', label: '🔴', emoji: '🧠', desc: t.memoryMatchDesc || 'Find matching color pairs!' },
   ]

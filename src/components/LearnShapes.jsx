@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useLanguage } from '../LanguageContext'
-import { playCorrectSound, playWrongSound, playLevelUpSound, playPopSound, playCountdownBeep } from '../sounds'
+import { playCorrectSound, playWrongSound, playLevelUpSound, playPopSound, playCountdownBeep, speakPrompt, speakName } from '../sounds'
 
 const SHAPES = [
   { name: 'Circle', render: (color, size) => <svg viewBox="0 0 100 100" width={size} height={size}><circle cx="50" cy="50" r="45" fill={color} /></svg> },
@@ -39,6 +39,7 @@ function getOptions(correct, all, count = 4) {
 function createShapeQueue() { return shuffle([...SHAPES]) }
 
 // ============ EASY MODE: Classic shape quiz with color hint ============
+// ============ EASY MODE: Voice says "Choose [shape]" BEFORE child taps ============
 function EasyMode({ onBack, onComplete, t, lang }) {
   const [round, setRound] = useState(1)
   const [score, setScore] = useState(0)
@@ -48,7 +49,9 @@ function EasyMode({ onBack, onComplete, t, lang }) {
   const [options, setOptions] = useState([])
   const [feedback, setFeedback] = useState('')
   const [selected, setSelected] = useState(null)
-  const [disabled, setDisabled] = useState(false)
+  const [disabled, setDisabled] = useState(true)
+  const [speaking, setSpeaking] = useState(false)
+  const [gameOver, setGameOver] = useState(false)
   const shapeQueue = useRef([])
 
   const getNextShape = useCallback(() => {
@@ -56,12 +59,11 @@ function EasyMode({ onBack, onComplete, t, lang }) {
     return shapeQueue.current.pop()
   }, [])
 
-  const newRound = useCallback(() => {
+  const newRound = useCallback(async () => {
     const shape = getNextShape()
     const mainColor = SHAPE_COLORS[Math.floor(Math.random() * SHAPE_COLORS.length)]
     const opts = getOptions(shape, SHAPES, 2)
     setCurrentShape(shape); setShapeColor(mainColor)
-    // Color hint: correct answer = same color
     const colors = {}
     opts.forEach(opt => {
       if (opt.name === shape.name) {
@@ -72,10 +74,14 @@ function EasyMode({ onBack, onComplete, t, lang }) {
       }
     })
     setOptionColors(colors); setOptions(opts)
-    setFeedback(''); setSelected(null); setDisabled(false)
-  }, [getNextShape])
+    setFeedback(''); setSelected(null); setDisabled(true); setSpeaking(true)
+    // Voice says "Choose [shape name]" BEFORE enabling buttons
+    await speakPrompt(t.shapes[shape.name], lang)
+    setSpeaking(false)
+    setDisabled(false)
+  }, [getNextShape, t, lang])
 
-  useEffect(() => { newRound() }, [newRound])
+  useEffect(() => { newRound() }, [])
 
   const handleAnswer = (opt) => {
     if (disabled) return
@@ -89,14 +95,51 @@ function EasyMode({ onBack, onComplete, t, lang }) {
     }
     setTimeout(() => {
       if (round >= ROUNDS_PER_LEVEL) {
-        onComplete(score + (opt.name === currentShape.name ? 1 : 0), ROUNDS_PER_LEVEL)
+        setGameOver(true)
+        playLevelUpSound(lang)
       } else { setRound(r => r + 1); newRound() }
-    }, 1200)
+    }, 1500)
+  }
+
+  if (gameOver) {
+    const finalScore = score
+    const emoji = finalScore >= 8 ? '🏆' : finalScore >= 5 ? '⭐' : '💪'
+    const msg = finalScore >= 8 ? (t.shapeMaster || 'Shape master!') :
+                finalScore >= 5 ? (t.greatEffort || 'Great effort!') :
+                (t.goodTry || 'Good try!')
+    return (
+      <div className="result-screen">
+        <div className="result-emoji">{emoji}</div>
+        <div className="result-score">{finalScore} / {ROUNDS_PER_LEVEL}</div>
+        <div className="result-message">{msg}</div>
+        <button className="play-again-btn" onClick={() => {
+          setRound(1); setScore(0); setGameOver(false)
+          shapeQueue.current = createShapeQueue()
+          newRound()
+        }}>{t.playAgain}</button>
+        <br /><br />
+        <button className="play-again-btn" style={{ background: '#aaa' }} onClick={onBack}>{t.home}</button>
+      </div>
+    )
   }
 
   return (
     <>
       <div className="round-info">{t.roundXofY(round, ROUNDS_PER_LEVEL)}</div>
+      <div style={{ textAlign: 'center', fontSize: '0.9rem', color: '#4CAF50', fontWeight: '600' }}>⭐ {score}</div>
+      
+      {/* Voice prompt indicator */}
+      {speaking && (
+        <div style={{
+          textAlign: 'center', padding: '8px', margin: '4px 12px',
+          background: 'linear-gradient(135deg, #e3f2fd, #bbdefb)', borderRadius: '12px',
+          fontSize: '1.1rem', fontWeight: '600', color: '#1565C0',
+          animation: 'pulse 1s ease-in-out infinite',
+        }}>
+          🔊 {t.choosePrompt ? t.choosePrompt(t.shapes[currentShape?.name]) : `Choose ${t.shapes[currentShape?.name]}!`}
+        </div>
+      )}
+
       <div className="display-area">
         {currentShape && <div className="shape-display">{currentShape.render(shapeColor, 120)}</div>}
       </div>
@@ -112,8 +155,9 @@ function EasyMode({ onBack, onComplete, t, lang }) {
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 padding: '8px', minHeight: '90px', borderRadius: '16px',
                 border: isCorrect ? '3px solid #28a745' : isWrong ? '3px solid #ff3333' : '3px solid #e0e0e0',
-                background: '#fff', cursor: 'pointer', transition: 'all 0.2s',
+                background: '#fff', cursor: disabled ? 'default' : 'pointer', transition: 'all 0.2s',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                opacity: disabled && !isSelected ? 0.6 : 1,
               }}
               onClick={() => handleAnswer(opt)}
             >
@@ -493,7 +537,7 @@ export default function LearnShapes({ onBack }) {
   const [diffLevel, setDiffLevel] = useState(null)
 
   const DIFFICULTIES = [
-    { key: 'easy', label: '🟢', emoji: '⭐', desc: t.shapeDesc || 'Match shapes to their names!' },
+    { key: 'easy', label: '🟢', emoji: '🔊', desc: t.easyShapeDesc || 'Voice guides you! Hear the shape, then tap it.' },
     { key: 'medium', label: '🟡', emoji: '🎈', desc: t.popShapesDesc || 'Pop the right falling shapes!' },
     { key: 'hard', label: '🔴', emoji: '⚡', desc: t.shapeChallengeDesc || 'Speed shape challenge with timer!' },
   ]
