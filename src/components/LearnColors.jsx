@@ -36,7 +36,7 @@ function getOptions(correct, all, count = 4) {
 function createColorQueue() { return shuffle([...COLORS]) }
 
 // ============ EASY MODE: Classic color quiz ============
-function EasyMode({ onBack, onComplete, t, lang }) {
+function EasyMode({ onBack, t, lang }) {
   const [round, setRound] = useState(1)
   const [score, setScore] = useState(0)
   const [currentColor, setCurrentColor] = useState(null)
@@ -44,6 +44,7 @@ function EasyMode({ onBack, onComplete, t, lang }) {
   const [feedback, setFeedback] = useState('')
   const [selected, setSelected] = useState(null)
   const [disabled, setDisabled] = useState(false)
+  const [gameOver, setGameOver] = useState(false)
   const colorQueue = useRef([])
 
   const getNextColor = useCallback(() => {
@@ -63,7 +64,8 @@ function EasyMode({ onBack, onComplete, t, lang }) {
   const handleAnswer = (opt) => {
     if (disabled) return
     setDisabled(true); setSelected(opt.name)
-    if (opt.name === currentColor.name) {
+    const isCorrect = opt.name === currentColor.name
+    if (isCorrect) {
       setScore(s => s + 1); setFeedback(t.correct)
       playCorrectSound(t.colors[currentColor.name], lang)
     } else {
@@ -72,14 +74,39 @@ function EasyMode({ onBack, onComplete, t, lang }) {
     }
     setTimeout(() => {
       if (round >= ROUNDS_PER_LEVEL) {
-        onComplete(score + (opt.name === currentColor.name ? 1 : 0), ROUNDS_PER_LEVEL)
+        setGameOver(true)
+        playLevelUpSound(lang)
       } else { setRound(r => r + 1); newRound() }
     }, 1200)
+  }
+
+  // Game over screen
+  if (gameOver) {
+    const finalScore = score
+    const emoji = finalScore >= 8 ? '🏆' : finalScore >= 5 ? '⭐' : '💪'
+    const msg = finalScore >= 8 ? (t.colorExpert || 'Color expert!') :
+                finalScore >= 5 ? (t.keepPracticing || 'Keep practicing!') :
+                (t.niceTry || 'Nice try!')
+    return (
+      <div className="result-screen">
+        <div className="result-emoji">{emoji}</div>
+        <div className="result-score">{finalScore} / {ROUNDS_PER_LEVEL}</div>
+        <div className="result-message">{msg}</div>
+        <button className="play-again-btn" onClick={() => {
+          setRound(1); setScore(0); setGameOver(false)
+          colorQueue.current = createColorQueue()
+          newRound()
+        }}>{t.playAgain}</button>
+        <br /><br />
+        <button className="play-again-btn" style={{ background: '#aaa' }} onClick={onBack}>{t.home}</button>
+      </div>
+    )
   }
 
   return (
     <>
       <div className="round-info">{t.roundXofY(round, ROUNDS_PER_LEVEL)}</div>
+      <div style={{ textAlign: 'center', fontSize: '0.9rem', color: '#4CAF50', fontWeight: '600' }}>⭐ {score}</div>
       <div className="display-area">
         {currentColor && (
           <div className="color-circle" style={{
@@ -130,8 +157,8 @@ function Balloon({ color, size }) {
   )
 }
 
-function MediumMode({ onBack, onComplete, t, lang }) {
-  const [phase, setPhase] = useState('intro') // intro, countdown, playing, done
+function MediumMode({ onBack, t, lang }) {
+  const [phase, setPhase] = useState('intro')
   const [target, setTarget] = useState(null)
   const [balloons, setBalloons] = useState([])
   const [score, setScore] = useState(0)
@@ -167,7 +194,6 @@ function MediumMode({ onBack, onComplete, t, lang }) {
     setScore(0); setWrongTaps(0); setTimeLeft(20)
     balloonsRef.current = []; setBalloons([])
     setCountdown(3); setPhase('countdown')
-    // Announce target
     try {
       const utterance = new SpeechSynthesisUtterance(
         lang === 'ur' ? `تمام ${t.colors[t2.name]} غبارے پھوڑیں!` :
@@ -183,7 +209,6 @@ function MediumMode({ onBack, onComplete, t, lang }) {
 
   useEffect(() => { startGame() }, [])
 
-  // Countdown
   useEffect(() => {
     if (phase !== 'countdown') return
     if (countdown <= 0) { setPhase('playing'); return }
@@ -192,7 +217,6 @@ function MediumMode({ onBack, onComplete, t, lang }) {
     return () => clearTimeout(tm)
   }, [phase, countdown])
 
-  // Timer
   useEffect(() => {
     if (phase !== 'playing') return
     if (timeLeft <= 0) { setPhase('done'); playLevelUpSound(lang); return }
@@ -200,16 +224,12 @@ function MediumMode({ onBack, onComplete, t, lang }) {
     return () => clearTimeout(timerRef.current)
   }, [phase, timeLeft, lang])
 
-  // Spawn
   useEffect(() => {
     if (phase !== 'playing') return
-    spawnRef.current = setInterval(() => {
-      balloonsRef.current.push(spawnBalloon())
-    }, 1000)
+    spawnRef.current = setInterval(() => { balloonsRef.current.push(spawnBalloon()) }, 1000)
     return () => clearInterval(spawnRef.current)
   }, [phase, spawnBalloon])
 
-  // Animation
   const animate = useCallback(() => {
     balloonsRef.current = balloonsRef.current
       .map(b => ({ ...b, y: b.popped ? b.y : b.y + b.speed, wobble: b.wobble + 0.5 }))
@@ -241,11 +261,8 @@ function MediumMode({ onBack, onComplete, t, lang }) {
       bl.id === b.id ? { ...bl, popped: true, wrong: !isTarget, popTime: Date.now() } : bl
     )
     setBalloons([...balloonsRef.current])
-    if (isTarget) {
-      setScore(s => s + 1); playPopSound()
-    } else {
-      setWrongTaps(w => w + 1); playWrongSound(t.colors[target.name], lang)
-    }
+    if (isTarget) { setScore(s => s + 1); playPopSound() }
+    else { setWrongTaps(w => w + 1); playWrongSound(t.colors[target.name], lang) }
   }
 
   const targetName = target ? t.colors[target.name] : ''
@@ -253,9 +270,7 @@ function MediumMode({ onBack, onComplete, t, lang }) {
   if (phase === 'countdown') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <div style={{ fontSize: '1.2rem', color: '#555', marginBottom: '12px' }}>
-          {t.popTarget || 'Pop all:'}
-        </div>
+        <div style={{ fontSize: '1.2rem', color: '#555', marginBottom: '12px' }}>{t.popTarget || 'Pop all:'}</div>
         <div style={{
           fontSize: '2rem', fontWeight: '700', marginBottom: '20px', padding: '12px 24px',
           borderRadius: '16px', background: target ? target.hex : '#ccc',
@@ -289,7 +304,6 @@ function MediumMode({ onBack, onComplete, t, lang }) {
     )
   }
 
-  // Playing
   return (
     <div style={{ overflow: 'hidden', position: 'relative', touchAction: 'none' }}>
       <div style={{
@@ -329,23 +343,24 @@ function MediumMode({ onBack, onComplete, t, lang }) {
 }
 
 // ============ HARD MODE: Color Memory Match ============
-function HardMode({ onBack, onComplete, t, lang }) {
-  const [phase, setPhase] = useState('playing') // playing, done
+function HardMode({ onBack, t, lang }) {
+  const [phase, setPhase] = useState('playing')
   const [cards, setCards] = useState([])
   const [flipped, setFlipped] = useState([])
   const [matched, setMatched] = useState([])
   const [moves, setMoves] = useState(0)
   const [timer, setTimer] = useState(0)
-  const [bestTime, setBestTime] = useState(null)
   const timerRef = useRef(null)
+  // Use ref to track flipped cards to avoid React state batching issues
+  const flippedRef = useRef([])
   const lockRef = useRef(false)
 
   const initGame = useCallback(() => {
-    // Pick 6 colors for 12 cards (6 pairs)
     const picked = shuffle([...COLORS]).slice(0, 6)
     const pairs = [...picked, ...picked].map((c, i) => ({ ...c, uid: i }))
     setCards(shuffle(pairs))
     setFlipped([]); setMatched([]); setMoves(0); setTimer(0)
+    flippedRef.current = []
     lockRef.current = false; setPhase('playing')
   }, [])
 
@@ -359,41 +374,50 @@ function HardMode({ onBack, onComplete, t, lang }) {
   }, [phase, matched.length, cards.length])
 
   const handleFlip = (index) => {
+    // Block if locked (checking a pair) or already flipped/matched
     if (lockRef.current) return
-    if (flipped.includes(index) || matched.includes(index)) return
+    if (flippedRef.current.includes(index)) return
+    if (matched.includes(index)) return
 
-    const newFlipped = [...flipped, index]
-    setFlipped(newFlipped)
+    // Add to flipped using ref (avoids stale state)
+    flippedRef.current = [...flippedRef.current, index]
+    setFlipped([...flippedRef.current])
 
-    if (newFlipped.length === 2) {
+    if (flippedRef.current.length === 2) {
+      // Two cards flipped - lock immediately
       lockRef.current = true
       setMoves(m => m + 1)
-      const [a, b] = newFlipped
+      const [a, b] = flippedRef.current
+
       if (cards[a].name === cards[b].name) {
-        // Match!
+        // Match found!
         playCorrectSound(t.colors[cards[a].name], lang)
         setTimeout(() => {
-          setMatched(m => [...m, a, b])
+          const newMatched = [...matched, a, b]
+          setMatched(newMatched)
+          flippedRef.current = []
           setFlipped([])
           lockRef.current = false
-          // Check win
-          if (matched.length + 2 === cards.length) {
+          // Check win - all 12 cards matched
+          if (newMatched.length === cards.length) {
             setPhase('done')
             clearInterval(timerRef.current)
             playLevelUpSound(lang)
           }
         }, 600)
       } else {
+        // No match - show briefly then flip back
         playWrongSound(t.colors[cards[a].name], lang)
         setTimeout(() => {
+          flippedRef.current = []
           setFlipped([])
           lockRef.current = false
-        }, 800)
+        }, 900)
       }
     }
   }
 
-  if (phase === 'done' || matched.length === cards.length && cards.length > 0) {
+  if (phase === 'done' || (matched.length === cards.length && cards.length > 0)) {
     const emoji = moves <= 10 ? '🏆' : moves <= 15 ? '⭐' : '💪'
     const stars = moves <= 10 ? 3 : moves <= 15 ? 2 : 1
     return (
@@ -424,6 +448,12 @@ function HardMode({ onBack, onComplete, t, lang }) {
         <span>🔄 {moves}</span>
         <span>⏱️ {timer}s</span>
       </div>
+      {/* How to play hint */}
+      {moves === 0 && (
+        <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#888', padding: '4px', background: '#f5f5f5', borderRadius: '8px', margin: '4px 12px' }}>
+          💡 {t.memoryHint || 'Tap 2 cards to flip them. Find all matching color pairs!'}
+        </div>
+      )}
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px',
         padding: '8px', maxWidth: '360px', margin: '0 auto',
@@ -437,9 +467,10 @@ function HardMode({ onBack, onComplete, t, lang }) {
               background: isFlipped ? card.hex : 'linear-gradient(135deg, #667eea, #764ba2)',
               border: isMatched ? '3px solid #4CAF50' : isFlipped ? '3px solid #fff' : '3px solid transparent',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.3s', transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)',
+              transition: 'all 0.3s',
               boxShadow: isMatched ? '0 0 15px rgba(76,175,80,0.4)' : '0 3px 10px rgba(0,0,0,0.15)',
               position: 'relative', overflow: 'hidden',
+              opacity: isMatched ? 0.7 : 1,
             }}>
               {isFlipped ? (
                 <span style={{
@@ -465,18 +496,13 @@ function HardMode({ onBack, onComplete, t, lang }) {
 // ============ MAIN COMPONENT ============
 export default function LearnColors({ onBack }) {
   const { t, lang } = useLanguage()
-  const [diffLevel, setDiffLevel] = useState(null) // null = selection screen
-  const [showResult, setShowResult] = useState(null)
+  const [diffLevel, setDiffLevel] = useState(null)
 
   const DIFFICULTIES = [
     { key: 'easy', label: '🟢', emoji: '🎨', desc: t.colorDesc || 'Tap the right color name!' },
     { key: 'medium', label: '🟡', emoji: '🎈', desc: t.popColorsDesc || 'Pop the right color balloons!' },
     { key: 'hard', label: '🔴', emoji: '🧠', desc: t.memoryMatchDesc || 'Find matching color pairs!' },
   ]
-
-  const handleComplete = (score, total) => {
-    setShowResult({ score, total })
-  }
 
   // Difficulty selection screen
   if (diffLevel === null) {
@@ -524,9 +550,9 @@ export default function LearnColors({ onBack }) {
         <span></span>
       </div>
 
-      {diffLevel === 0 && <EasyMode onBack={() => setDiffLevel(null)} onComplete={handleComplete} t={t} lang={lang} />}
-      {diffLevel === 1 && <MediumMode onBack={() => setDiffLevel(null)} onComplete={handleComplete} t={t} lang={lang} />}
-      {diffLevel === 2 && <HardMode onBack={() => setDiffLevel(null)} onComplete={handleComplete} t={t} lang={lang} />}
+      {diffLevel === 0 && <EasyMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
+      {diffLevel === 1 && <MediumMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
+      {diffLevel === 2 && <HardMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
     </div>
   )
 }
