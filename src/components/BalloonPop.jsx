@@ -37,9 +37,9 @@ function renderShape(shapeName, color, size) {
 
 // Balloon SVG component at top level
 
-const GAME_DURATIONS = [15, 20, 25] // seconds per difficulty
-const SPAWN_INTERVALS = [1200, 900, 600] // ms between spawns
-const FALL_SPEEDS = [2.5, 3.5, 4.5] // pixels per frame
+const GAME_DURATIONS = [25, 25, 30] // seconds per difficulty - more time for kids
+const SPAWN_INTERVALS = [900, 800, 600] // ms between spawns - more objects to pop
+const FALL_SPEEDS = [1.2, 1.8, 2.5] // pixels per frame - much slower for kids
 
 let balloonId = 0
 
@@ -79,7 +79,7 @@ export default function BalloonPop({ mode, onBack }) {
 
   const spawnBalloon = useCallback(() => {
     const areaWidth = areaRef.current ? areaRef.current.offsetWidth : 300
-    const x = 20 + Math.random() * (areaWidth - 80)
+    const x = 10 + Math.random() * (areaWidth - 100)
     
     let item
     if (isColors) {
@@ -88,8 +88,8 @@ export default function BalloonPop({ mode, onBack }) {
       item = SHAPE_TYPES[Math.floor(Math.random() * SHAPE_TYPES.length)]
     }
     
-    // Make sure ~40% are target items
-    if (Math.random() < 0.4 && target) {
+    // 50% are target items - more targets = more fun for kids
+    if (Math.random() < 0.5 && target) {
       item = target
     }
 
@@ -101,9 +101,10 @@ export default function BalloonPop({ mode, onBack }) {
       item,
       color,
       x,
-      y: -80,
-      size: 50 + Math.random() * 15,
-      speed: fallSpeed * (0.8 + Math.random() * 0.4),
+      y: -120,
+      // Bigger (65-85px) for easier tapping
+      size: 65 + Math.random() * 20,
+      speed: fallSpeed * (0.8 + Math.random() * 0.3),
       popped: false,
       wrong: false,
     }
@@ -382,11 +383,14 @@ export default function BalloonPop({ mode, onBack }) {
         {balloons.map(b => (
           <div
             key={b.id}
-            onClick={() => handleTap(b)}
+            onPointerDown={(e) => { e.preventDefault(); handleTap(b) }}
             style={{
               position: 'absolute',
               left: b.x,
               top: b.y,
+              // Extra 20px padding for easier tapping by kids
+              padding: '20px',
+              margin: '-20px',
               cursor: 'pointer',
               transition: b.popped ? 'transform 0.3s, opacity 0.3s' : 'none',
               transform: b.popped ? 'scale(1.5)' : 'scale(1)',
@@ -394,24 +398,25 @@ export default function BalloonPop({ mode, onBack }) {
               zIndex: 5,
               userSelect: 'none',
               WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation',
             }}
           >
             {b.popped && !b.wrong && (
               <div style={{
-                position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)',
-                fontSize: '1.5rem', zIndex: 20,
+                position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)',
+                fontSize: '1.8rem', zIndex: 20,
               }}>✅</div>
             )}
             {b.popped && b.wrong && (
               <div style={{
-                position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)',
-                fontSize: '1.5rem', zIndex: 20,
+                position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)',
+                fontSize: '1.8rem', zIndex: 20,
               }}>❌</div>
             )}
             {isColors ? (
               <Balloon color={b.color} size={b.size} />
             ) : (
-              <div style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
+              <div style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))' }}>
                 {renderShape(b.item.name, b.color, b.size)}
               </div>
             )}
@@ -425,12 +430,12 @@ export default function BalloonPop({ mode, onBack }) {
 // Balloon SVG
 function Balloon({ color, size }) {
   return (
-    <svg viewBox="0 0 80 120" width={size} height={size * 1.5} style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }}>
-      <ellipse cx="40" cy="42" rx="32" ry="38" fill={color} />
-      <ellipse cx="40" cy="42" rx="32" ry="38" fill="rgba(255,255,255,0.12)" />
-      <ellipse cx="30" cy="28" rx="7" ry="11" fill="rgba(255,255,255,0.35)" />
-      <polygon points="36,78 40,85 44,78" fill={color} />
-      <path d="M40,85 Q38,95 42,105 Q40,110 38,118" stroke="#999" strokeWidth="1.5" fill="none" />
+    <svg viewBox="0 0 80 120" width={size} height={size * 1.5} style={{ filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.25))' }}>
+      <ellipse cx="40" cy="42" rx="35" ry="40" fill={color} />
+      <ellipse cx="40" cy="42" rx="35" ry="40" fill="rgba(255,255,255,0.12)" />
+      <ellipse cx="30" cy="26" rx="9" ry="13" fill="rgba(255,255,255,0.35)" />
+      <polygon points="36,80 40,88 44,80" fill={color} />
+      <path d="M40,88 Q38,98 42,108 Q40,113 38,120" stroke="#999" strokeWidth="1.5" fill="none" />
     </svg>
   )
 }

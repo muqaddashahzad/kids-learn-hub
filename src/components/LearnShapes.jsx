@@ -150,14 +150,18 @@ function MediumMode({ onBack, onComplete, t, lang }) {
 
   const spawnShape = useCallback(() => {
     const areaWidth = areaRef.current ? areaRef.current.offsetWidth : 300
-    const x = 20 + Math.random() * (areaWidth - 80)
+    const x = 10 + Math.random() * (areaWidth - 100)
     let item = SHAPES[Math.floor(Math.random() * SHAPES.length)]
-    if (Math.random() < 0.4 && target) item = target
+    // 50% chance to be the target - more targets = more fun
+    if (Math.random() < 0.5 && target) item = target
     const color = SHAPE_COLORS[Math.floor(Math.random() * SHAPE_COLORS.length)]
     shapeId++
     return {
-      id: shapeId, item, color, x, y: -80,
-      size: 45 + Math.random() * 15, speed: 2.2 * (0.8 + Math.random() * 0.4),
+      id: shapeId, item, color, x, y: -120,
+      // Bigger shapes (60-80px) for easier tapping
+      size: 60 + Math.random() * 20,
+      // Slower speed for kids
+      speed: 1.2 * (0.8 + Math.random() * 0.3),
       popped: false, wrong: false, rotation: Math.random() * 360,
     }
   }, [target])
@@ -165,7 +169,7 @@ function MediumMode({ onBack, onComplete, t, lang }) {
   const startGame = useCallback(() => {
     const t2 = SHAPES[Math.floor(Math.random() * SHAPES.length)]
     setTarget(t2)
-    setScore(0); setWrongTaps(0); setTimeLeft(20)
+    setScore(0); setWrongTaps(0); setTimeLeft(25)
     shapesRef.current = []; setShapes([])
     setCountdown(3); setPhase('countdown')
     try {
@@ -201,7 +205,7 @@ function MediumMode({ onBack, onComplete, t, lang }) {
 
   useEffect(() => {
     if (phase !== 'playing') return
-    spawnRef.current = setInterval(() => { shapesRef.current.push(spawnShape()) }, 900)
+    spawnRef.current = setInterval(() => { shapesRef.current.push(spawnShape()) }, 800)
     return () => clearInterval(spawnRef.current)
   }, [phase, spawnShape])
 
@@ -297,16 +301,23 @@ function MediumMode({ onBack, onComplete, t, lang }) {
       </div>
       <div ref={areaRef} style={{ position: 'relative', width: '100%', height: 'calc(100vh - 140px)', overflow: 'hidden' }}>
         {shapes.map(s => (
-          <div key={s.id} onClick={() => handleTap(s)} style={{
-            position: 'absolute', left: s.x, top: s.y, cursor: 'pointer',
-            transition: s.popped ? 'transform 0.3s, opacity 0.3s' : 'none',
-            transform: s.popped ? 'scale(1.5)' : `rotate(${Math.sin(s.rotation * 0.03) * 15}deg)`,
-            opacity: s.popped ? 0 : 1, zIndex: 5, userSelect: 'none',
-            WebkitTapHighlightColor: 'transparent',
-            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+          <div key={s.id}
+            onPointerDown={(e) => { e.preventDefault(); handleTap(s) }}
+            style={{
+              position: 'absolute', left: s.x, top: s.y,
+              // Extra 20px padding for easier tapping by kids
+              padding: '20px', margin: '-20px',
+              cursor: 'pointer',
+              transition: s.popped ? 'transform 0.3s, opacity 0.3s' : 'none',
+              // Reduced rotation wobble (from 15deg to 5deg) so shapes are easier to tap
+              transform: s.popped ? 'scale(1.5)' : `rotate(${Math.sin(s.rotation * 0.03) * 5}deg)`,
+              opacity: s.popped ? 0 : 1, zIndex: 5, userSelect: 'none',
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation',
+              filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))',
           }}>
-            {s.popped && !s.wrong && <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', fontSize: '1.5rem', zIndex: 20 }}>✅</div>}
-            {s.popped && s.wrong && <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', fontSize: '1.5rem', zIndex: 20 }}>❌</div>}
+            {s.popped && !s.wrong && <div style={{ position: 'absolute', top: '0px', left: '50%', transform: 'translateX(-50%)', fontSize: '1.8rem', zIndex: 20 }}>✅</div>}
+            {s.popped && s.wrong && <div style={{ position: 'absolute', top: '0px', left: '50%', transform: 'translateX(-50%)', fontSize: '1.8rem', zIndex: 20 }}>❌</div>}
             {renderShape(s.item.name, s.color, s.size)}
           </div>
         ))}

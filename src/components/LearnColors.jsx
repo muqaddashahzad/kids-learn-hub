@@ -147,12 +147,12 @@ let balloonId = 0
 
 function Balloon({ color, size }) {
   return (
-    <svg viewBox="0 0 80 120" width={size} height={size * 1.5} style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }}>
-      <ellipse cx="40" cy="42" rx="32" ry="38" fill={color} />
-      <ellipse cx="40" cy="42" rx="32" ry="38" fill="rgba(255,255,255,0.12)" />
-      <ellipse cx="30" cy="28" rx="7" ry="11" fill="rgba(255,255,255,0.35)" />
-      <polygon points="36,78 40,85 44,78" fill={color} />
-      <path d="M40,85 Q38,95 42,105 Q40,110 38,118" stroke="#999" strokeWidth="1.5" fill="none" />
+    <svg viewBox="0 0 80 120" width={size} height={size * 1.5} style={{ filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.25))' }}>
+      <ellipse cx="40" cy="42" rx="35" ry="40" fill={color} />
+      <ellipse cx="40" cy="42" rx="35" ry="40" fill="rgba(255,255,255,0.12)" />
+      <ellipse cx="30" cy="26" rx="9" ry="13" fill="rgba(255,255,255,0.35)" />
+      <polygon points="36,80 40,88 44,80" fill={color} />
+      <path d="M40,88 Q38,98 42,108 Q40,113 38,120" stroke="#999" strokeWidth="1.5" fill="none" />
     </svg>
   )
 }
@@ -177,13 +177,17 @@ function MediumMode({ onBack, t, lang }) {
 
   const spawnBalloon = useCallback(() => {
     const areaWidth = areaRef.current ? areaRef.current.offsetWidth : 300
-    const x = 20 + Math.random() * (areaWidth - 80)
+    const x = 10 + Math.random() * (areaWidth - 100)
     let item = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)]
-    if (Math.random() < 0.4 && target) item = target
+    // 50% chance to be the target color - more targets = more fun for kids
+    if (Math.random() < 0.5 && target) item = target
     balloonId++
     return {
-      id: balloonId, item, color: item.hex, x, y: -80,
-      size: 45 + Math.random() * 15, speed: 2 * (0.8 + Math.random() * 0.4),
+      id: balloonId, item, color: item.hex, x, y: -120,
+      // Bigger balloons (65-85px) for easier tapping
+      size: 65 + Math.random() * 20,
+      // Slower speed so kids can track and tap
+      speed: 1.2 * (0.8 + Math.random() * 0.3),
       popped: false, wrong: false, wobble: Math.random() * 360,
     }
   }, [target])
@@ -191,7 +195,7 @@ function MediumMode({ onBack, t, lang }) {
   const startGame = useCallback(() => {
     const t2 = pickTarget()
     setTarget(t2)
-    setScore(0); setWrongTaps(0); setTimeLeft(20)
+    setScore(0); setWrongTaps(0); setTimeLeft(25)
     balloonsRef.current = []; setBalloons([])
     setCountdown(3); setPhase('countdown')
     try {
@@ -226,7 +230,8 @@ function MediumMode({ onBack, t, lang }) {
 
   useEffect(() => {
     if (phase !== 'playing') return
-    spawnRef.current = setInterval(() => { balloonsRef.current.push(spawnBalloon()) }, 1000)
+    // Spawn more frequently so there's always something to pop
+    spawnRef.current = setInterval(() => { balloonsRef.current.push(spawnBalloon()) }, 800)
     return () => clearInterval(spawnRef.current)
   }, [phase, spawnBalloon])
 
@@ -326,14 +331,26 @@ function MediumMode({ onBack, t, lang }) {
       </div>
       <div ref={areaRef} style={{ position: 'relative', width: '100%', height: 'calc(100vh - 140px)', overflow: 'hidden' }}>
         {balloons.map(b => (
-          <div key={b.id} onClick={() => handleTap(b)} style={{
-            position: 'absolute', left: b.x + Math.sin(b.wobble * 0.05) * 8, top: b.y,
-            cursor: 'pointer', transition: b.popped ? 'transform 0.3s, opacity 0.3s' : 'none',
-            transform: b.popped ? 'scale(1.5)' : 'scale(1)', opacity: b.popped ? 0 : 1,
-            zIndex: 5, userSelect: 'none', WebkitTapHighlightColor: 'transparent',
+          <div key={b.id}
+            onPointerDown={(e) => { e.preventDefault(); handleTap(b) }}
+            style={{
+              position: 'absolute',
+              // Gentle wobble (reduced from 8 to 3 so kids don't miss)
+              left: b.x + Math.sin(b.wobble * 0.04) * 3,
+              top: b.y,
+              // Extra 20px padding around balloon for easier tapping
+              padding: '20px',
+              margin: '-20px',
+              cursor: 'pointer',
+              transition: b.popped ? 'transform 0.3s, opacity 0.3s' : 'none',
+              transform: b.popped ? 'scale(1.5)' : 'scale(1)',
+              opacity: b.popped ? 0 : 1,
+              zIndex: 5, userSelect: 'none',
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation',
           }}>
-            {b.popped && !b.wrong && <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', fontSize: '1.5rem', zIndex: 20 }}>✅</div>}
-            {b.popped && b.wrong && <div style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', fontSize: '1.5rem', zIndex: 20 }}>❌</div>}
+            {b.popped && !b.wrong && <div style={{ position: 'absolute', top: '0px', left: '50%', transform: 'translateX(-50%)', fontSize: '1.8rem', zIndex: 20 }}>✅</div>}
+            {b.popped && b.wrong && <div style={{ position: 'absolute', top: '0px', left: '50%', transform: 'translateX(-50%)', fontSize: '1.8rem', zIndex: 20 }}>❌</div>}
             <Balloon color={b.color} size={b.size} />
           </div>
         ))}
