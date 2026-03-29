@@ -160,19 +160,7 @@ body {
   box-shadow: 0 12px 35px rgba(0,0,0,0.15);
 }
 
-.game-card.colors { border-color: #ff9a9e; background: linear-gradient(135deg, #fff5f5, #ffe0e0); }
-.game-card.shapes { border-color: #a18cd1; background: linear-gradient(135deg, #f5f0ff, #e8dff5); }
-.game-card.ballooncolors {
-  border-left: 5px solid #FF6B6B;
-  background: linear-gradient(135deg, #fff5f5, #ffe0e0);
-}
-
-.game-card.balloonshapes {
-  border-left: 5px solid #4ECDC4;
-  background: linear-gradient(135deg, #f0fffe, #d0f5f2);
-}
-
-.game-card.sudoku { border-color: #84fab0; background: linear-gradient(135deg, #f0fff4, #d4f5e0); }
+/* Card styles are now inline via HomeScreen.jsx CARD_STYLES */
 
 .card-emoji {
   font-size: 3rem;

@@ -69,7 +69,70 @@ export const translations = {
     shapes: {
       Circle: 'Circle', Square: 'Square', Triangle: 'Triangle', Rectangle: 'Rectangle',
       Star: 'Star', Heart: 'Heart', Diamond: 'Diamond', Oval: 'Oval'
-    }
+    },
+    forWord: 'for',
+    whatIsThis: 'What is this?',
+    whatLetterFor: 'What is this letter for?',
+    amazing: 'Amazing!',
+    easyQuizDesc: 'Voice guides you! Hear the name, then tap it.',
+    mediumQuizDesc: 'See the picture, pick the right name!',
+    hardQuizDesc: 'Speed challenge with timer!',
+    categoryTitles: {
+      animals: 'Animals',
+      fruits: 'Fruits',
+      alphabet: 'Alphabet',
+      vegetables: 'Vegetables',
+      kitchen: 'Kitchen Items',
+      home: 'Home Items',
+      objects: 'Everyday Objects',
+    },
+    categoryDescs: {
+      animals: 'Learn animal names and sounds!',
+      fruits: 'Learn fruit names!',
+      alphabet: 'A for Apple, B for Bear...',
+      vegetables: 'Learn vegetable names!',
+      kitchen: 'Learn kitchen item names!',
+      home: 'Learn things found at home!',
+      objects: 'Learn everyday object names!',
+    },
+    categories: {
+      animals: {
+        Cat: 'Cat', Dog: 'Dog', Cow: 'Cow', Lion: 'Lion', Elephant: 'Elephant',
+        Duck: 'Duck', Chicken: 'Chicken', Horse: 'Horse', Sheep: 'Sheep', Pig: 'Pig',
+        Frog: 'Frog', Bird: 'Bird', Fish: 'Fish', Monkey: 'Monkey', Bear: 'Bear', Rabbit: 'Rabbit',
+      },
+      fruits: {
+        Apple: 'Apple', Banana: 'Banana', Orange: 'Orange', Grapes: 'Grapes',
+        Strawberry: 'Strawberry', Watermelon: 'Watermelon', Mango: 'Mango', Pineapple: 'Pineapple',
+        Cherry: 'Cherry', Peach: 'Peach', Pear: 'Pear', Lemon: 'Lemon', Coconut: 'Coconut', Kiwi: 'Kiwi',
+      },
+      alphabet: {
+        A: 'Apple', B: 'Bear', C: 'Cat', D: 'Dog', E: 'Elephant', F: 'Fish',
+        G: 'Grapes', H: 'Horse', I: 'Ice Cream', J: 'Juice', K: 'Kite', L: 'Lion',
+        M: 'Monkey', N: 'Nose', O: 'Orange', P: 'Penguin', Q: 'Queen', R: 'Rabbit',
+        S: 'Star', T: 'Turtle', U: 'Umbrella', V: 'Violin', W: 'Whale', X: 'Xylophone',
+        Y: 'Yo-yo', Z: 'Zebra',
+      },
+      vegetables: {
+        Carrot: 'Carrot', Tomato: 'Tomato', Corn: 'Corn', Broccoli: 'Broccoli',
+        Potato: 'Potato', Onion: 'Onion', Garlic: 'Garlic', Pepper: 'Pepper',
+        Cucumber: 'Cucumber', Eggplant: 'Eggplant', Mushroom: 'Mushroom', Lettuce: 'Lettuce',
+      },
+      kitchen: {
+        Spoon: 'Spoon', Fork: 'Fork', Knife: 'Knife', Plate: 'Plate', Cup: 'Cup',
+        Glass: 'Glass', Pot: 'Pot', Bowl: 'Bowl', Bottle: 'Bottle', Pan: 'Pan',
+      },
+      home: {
+        Bed: 'Bed', Chair: 'Chair', Door: 'Door', Window: 'Window', Lamp: 'Lamp',
+        Clock: 'Clock', TV: 'TV', Phone: 'Phone', Book: 'Book', Key: 'Key',
+        Mirror: 'Mirror', Toilet: 'Toilet',
+      },
+      objects: {
+        Ball: 'Ball', Car: 'Car', Bus: 'Bus', Train: 'Train', Airplane: 'Airplane',
+        Bicycle: 'Bicycle', Umbrella: 'Umbrella', Hat: 'Hat', Shoe: 'Shoe', Bag: 'Bag',
+        Pencil: 'Pencil', Scissors: 'Scissors', Star: 'Star', Sun: 'Sun', Moon: 'Moon', Cloud: 'Cloud',
+      },
+    },
   },
   ur: {
     learnColors: 'رنگ سیکھیں',
@@ -141,7 +204,70 @@ export const translations = {
     shapes: {
       Circle: 'دائرہ', Square: 'مربع', Triangle: 'مثلث', Rectangle: 'مستطیل',
       Star: 'ستارہ', Heart: 'دل', Diamond: 'ہیرا', Oval: 'بیضوی'
-    }
+    },
+    forWord: 'سے',
+    whatIsThis: '؟یہ کیا ہے',
+    whatLetterFor: '؟یہ حرف کس لیے ہے',
+    amazing: '!شاندار',
+    easyQuizDesc: '!آواز آپ کی رہنمائی کرے گی! نام سنیں، پھر تھپتھپائیں',
+    mediumQuizDesc: '!تصویر دیکھیں، صحیح نام چنیں',
+    hardQuizDesc: '!ٹائمر کے ساتھ سپیڈ چیلنج',
+    categoryTitles: {
+      animals: 'جانور',
+      fruits: 'پھل',
+      alphabet: 'حروفِ تہجی',
+      vegetables: 'سبزیاں',
+      kitchen: 'باورچی خانے کی چیزیں',
+      home: 'گھر کی چیزیں',
+      objects: 'روزمرہ کی چیزیں',
+    },
+    categoryDescs: {
+      animals: '!جانوروں کے نام اور آوازیں سیکھیں',
+      fruits: '!پھلوں کے نام سیکھیں',
+      alphabet: '...A سیب کے لیے، B ریچھ کے لیے',
+      vegetables: '!سبزیوں کے نام سیکھیں',
+      kitchen: '!باورچی خانے کی چیزوں کے نام سیکھیں',
+      home: '!گھر کی چیزوں کے نام سیکھیں',
+      objects: '!روزمرہ چیزوں کے نام سیکھیں',
+    },
+    categories: {
+      animals: {
+        Cat: 'بلی', Dog: 'کتا', Cow: 'گائے', Lion: 'شیر', Elephant: 'ہاتھی',
+        Duck: 'بطخ', Chicken: 'مرغی', Horse: 'گھوڑا', Sheep: 'بھیڑ', Pig: 'سور',
+        Frog: 'مینڈک', Bird: 'پرندہ', Fish: 'مچھلی', Monkey: 'بندر', Bear: 'ریچھ', Rabbit: 'خرگوش',
+      },
+      fruits: {
+        Apple: 'سیب', Banana: 'کیلا', Orange: 'مالٹا', Grapes: 'انگور',
+        Strawberry: 'اسٹرابیری', Watermelon: 'تربوز', Mango: 'آم', Pineapple: 'انناس',
+        Cherry: 'چیری', Peach: 'آڑو', Pear: 'ناشپاتی', Lemon: 'لیموں', Coconut: 'ناریل', Kiwi: 'کیوی',
+      },
+      alphabet: {
+        A: 'سیب', B: 'ریچھ', C: 'بلی', D: 'کتا', E: 'ہاتھی', F: 'مچھلی',
+        G: 'انگور', H: 'گھوڑا', I: 'آئس کریم', J: 'جوس', K: 'پتنگ', L: 'شیر',
+        M: 'بندر', N: 'ناک', O: 'مالٹا', P: 'پینگوئن', Q: 'ملکہ', R: 'خرگوش',
+        S: 'ستارہ', T: 'کچھوا', U: 'چھتری', V: 'وائلن', W: 'وہیل', X: 'زائلوفون',
+        Y: 'یو یو', Z: 'زیبرا',
+      },
+      vegetables: {
+        Carrot: 'گاجر', Tomato: 'ٹماٹر', Corn: 'مکئی', Broccoli: 'بروکلی',
+        Potato: 'آلو', Onion: 'پیاز', Garlic: 'لہسن', Pepper: 'مرچ',
+        Cucumber: 'کھیرا', Eggplant: 'بینگن', Mushroom: 'کھمبی', Lettuce: 'سلاد پتہ',
+      },
+      kitchen: {
+        Spoon: 'چمچ', Fork: 'کانٹا', Knife: 'چھری', Plate: 'پلیٹ', Cup: 'کپ',
+        Glass: 'گلاس', Pot: 'ہانڈی', Bowl: 'پیالہ', Bottle: 'بوتل', Pan: 'توا',
+      },
+      home: {
+        Bed: 'بستر', Chair: 'کرسی', Door: 'دروازہ', Window: 'کھڑکی', Lamp: 'لیمپ',
+        Clock: 'گھڑی', TV: 'ٹی وی', Phone: 'فون', Book: 'کتاب', Key: 'چابی',
+        Mirror: 'آئینہ', Toilet: 'بیت الخلا',
+      },
+      objects: {
+        Ball: 'گیند', Car: 'گاڑی', Bus: 'بس', Train: 'ٹرین', Airplane: 'ہوائی جہاز',
+        Bicycle: 'سائیکل', Umbrella: 'چھتری', Hat: 'ٹوپی', Shoe: 'جوتا', Bag: 'بیگ',
+        Pencil: 'پنسل', Scissors: 'قینچی', Star: 'ستارہ', Sun: 'سورج', Moon: 'چاند', Cloud: 'بادل',
+      },
+    },
   },
   hi: {
     learnColors: 'रंग सीखें',
@@ -213,6 +339,69 @@ export const translations = {
     shapes: {
       Circle: 'गोला', Square: 'वर्ग', Triangle: 'त्रिकोण', Rectangle: 'आयत',
       Star: 'तारा', Heart: 'दिल', Diamond: 'हीरा', Oval: 'अंडाकार'
-    }
+    },
+    forWord: 'से',
+    whatIsThis: 'यह क्या है?',
+    whatLetterFor: 'यह अक्षर किसके लिए है?',
+    amazing: 'शानदार!',
+    easyQuizDesc: 'आवाज़ मदद करेगी! नाम सुनो, फिर टैप करो।',
+    mediumQuizDesc: 'तस्वीर देखो, सही नाम चुनो!',
+    hardQuizDesc: 'टाइमर के साथ स्पीड चैलेंज!',
+    categoryTitles: {
+      animals: 'जानवर',
+      fruits: 'फल',
+      alphabet: 'वर्णमाला',
+      vegetables: 'सब्ज़ियाँ',
+      kitchen: 'रसोई की चीज़ें',
+      home: 'घर की चीज़ें',
+      objects: 'रोज़मर्रा की चीज़ें',
+    },
+    categoryDescs: {
+      animals: 'जानवरों के नाम और आवाज़ें सीखो!',
+      fruits: 'फलों के नाम सीखो!',
+      alphabet: 'A सेब के लिए, B भालू के लिए...',
+      vegetables: 'सब्ज़ियों के नाम सीखो!',
+      kitchen: 'रसोई की चीज़ों के नाम सीखो!',
+      home: 'घर की चीज़ें सीखो!',
+      objects: 'रोज़मर्रा की चीज़ों के नाम सीखो!',
+    },
+    categories: {
+      animals: {
+        Cat: 'बिल्ली', Dog: 'कुत्ता', Cow: 'गाय', Lion: 'शेर', Elephant: 'हाथी',
+        Duck: 'बतख', Chicken: 'मुर्गी', Horse: 'घोड़ा', Sheep: 'भेड़', Pig: 'सूअर',
+        Frog: 'मेंढक', Bird: 'चिड़िया', Fish: 'मछली', Monkey: 'बंदर', Bear: 'भालू', Rabbit: 'खरगोश',
+      },
+      fruits: {
+        Apple: 'सेब', Banana: 'केला', Orange: 'संतरा', Grapes: 'अंगूर',
+        Strawberry: 'स्ट्रॉबेरी', Watermelon: 'तरबूज़', Mango: 'आम', Pineapple: 'अनानास',
+        Cherry: 'चेरी', Peach: 'आड़ू', Pear: 'नाशपाती', Lemon: 'नींबू', Coconut: 'नारियल', Kiwi: 'कीवी',
+      },
+      alphabet: {
+        A: 'सेब', B: 'भालू', C: 'बिल्ली', D: 'कुत्ता', E: 'हाथी', F: 'मछली',
+        G: 'अंगूर', H: 'घोड़ा', I: 'आइसक्रीम', J: 'जूस', K: 'पतंग', L: 'शेर',
+        M: 'बंदर', N: 'नाक', O: 'संतरा', P: 'पेंगुइन', Q: 'रानी', R: 'खरगोश',
+        S: 'तारा', T: 'कछुआ', U: 'छतरी', V: 'वायलिन', W: 'व्हेल', X: 'ज़ाइलोफ़ोन',
+        Y: 'यो-यो', Z: 'ज़ेबरा',
+      },
+      vegetables: {
+        Carrot: 'गाजर', Tomato: 'टमाटर', Corn: 'मक्का', Broccoli: 'ब्रोकली',
+        Potato: 'आलू', Onion: 'प्याज़', Garlic: 'लहसुन', Pepper: 'मिर्च',
+        Cucumber: 'खीरा', Eggplant: 'बैंगन', Mushroom: 'मशरूम', Lettuce: 'सलाद पत्ता',
+      },
+      kitchen: {
+        Spoon: 'चम्मच', Fork: 'काँटा', Knife: 'चाकू', Plate: 'प्लेट', Cup: 'कप',
+        Glass: 'गिलास', Pot: 'बर्तन', Bowl: 'कटोरा', Bottle: 'बोतल', Pan: 'तवा',
+      },
+      home: {
+        Bed: 'बिस्तर', Chair: 'कुर्सी', Door: 'दरवाज़ा', Window: 'खिड़की', Lamp: 'लैंप',
+        Clock: 'घड़ी', TV: 'टीवी', Phone: 'फ़ोन', Book: 'किताब', Key: 'चाबी',
+        Mirror: 'आईना', Toilet: 'शौचालय',
+      },
+      objects: {
+        Ball: 'गेंद', Car: 'गाड़ी', Bus: 'बस', Train: 'ट्रेन', Airplane: 'हवाई जहाज़',
+        Bicycle: 'साइकिल', Umbrella: 'छतरी', Hat: 'टोपी', Shoe: 'जूता', Bag: 'बैग',
+        Pencil: 'पेंसिल', Scissors: 'कैंची', Star: 'तारा', Sun: 'सूरज', Moon: 'चाँद', Cloud: 'बादल',
+      },
+    },
   }
 };
