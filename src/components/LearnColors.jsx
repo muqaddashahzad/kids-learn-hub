@@ -418,6 +418,9 @@ function HardMode({ onBack, t, lang }) {
     flippedRef.current = [...flippedRef.current, index]
     setFlipped([...flippedRef.current])
 
+    // Speak the color name when card is flipped (helps kids learn)
+    speakName(t.colors[cards[index].name], lang)
+
     if (flippedRef.current.length === 2) {
       // Two cards flipped - lock immediately
       lockRef.current = true
