@@ -284,7 +284,7 @@ function MediumMode({ onBack, t, lang }) {
       bl.id === b.id ? { ...bl, popped: true, wrong: !isTarget, popTime: Date.now() } : bl
     )
     setBalloons([...balloonsRef.current])
-    if (isTarget) { setScore(s => s + 1); playPopSound() }
+    if (isTarget) { setScore(s => s + 1); playPopSound(); speakName(t.colors[target.name], lang) }
     else { setWrongTaps(w => w + 1); playWrongSound(t.colors[target.name], lang) }
   }
 

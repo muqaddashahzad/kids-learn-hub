@@ -284,7 +284,7 @@ function MediumMode({ onBack, onComplete, t, lang }) {
       sh.id === s.id ? { ...sh, popped: true, wrong: !isTarget, popTime: Date.now() } : sh
     )
     setShapes([...shapesRef.current])
-    if (isTarget) { setScore(sc => sc + 1); playPopSound() }
+    if (isTarget) { setScore(sc => sc + 1); playPopSound(); speakName(t.shapes[target.name], lang) }
     else { setWrongTaps(w => w + 1); playWrongSound(t.shapes[target.name], lang) }
   }
 
