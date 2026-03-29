@@ -32,16 +32,35 @@ function getItemName(t, categoryKey, item) {
 
 // For alphabet, get the display label (e.g., "A for Apple")
 function getAlphabetLabel(t, item) {
-  const word = item.word || item.name
-  const translatedWord = t.categories?.alphabet?.[item.name] || word
-  if (item.word) {
-    const forWord = t.forWord || 'for'
-    return `${item.name} ${forWord} ${translatedWord}`
-  }
-  return item.name
+  const translatedWord = t.categories?.alphabet?.[item.name] || item.word || item.name
+  const forWord = t.forWord || 'for'
+  return `${item.name} ${forWord} ${translatedWord}`
 }
 
-// ============ EASY MODE: Voice says name BEFORE child taps ============
+// Build speech text for an item
+function buildSpeechText(t, categoryKey, item) {
+  if (categoryKey === 'alphabet') {
+    const word = t.categories?.alphabet?.[item.name] || item.word || item.name
+    const forWord = t.forWord || 'for'
+    return `${item.name}, ${forWord} ${word}`
+  }
+  return getItemName(t, categoryKey, item)
+}
+
+// Speak the answer with optional animal sound
+async function speakAnswer(t, categoryKey, item, lang) {
+  const speechText = buildSpeechText(t, categoryKey, item)
+  await speakPrompt(speechText, lang)
+  // For animals, also say the sound
+  if (categoryKey === 'animals' && item.sound) {
+    await new Promise(r => setTimeout(r, 400))
+    speakName(item.sound, lang)
+    await new Promise(r => setTimeout(r, 900))
+  }
+}
+
+// ============ EASY MODE ============
+// Voice says name BEFORE tap, shows emoji + name text, 3 options with emoji+text
 function EasyMode({ categoryKey, onBack, t, lang }) {
   const items = CATEGORIES[categoryKey].items
   const isAlphabet = categoryKey === 'alphabet'
@@ -68,31 +87,10 @@ function EasyMode({ categoryKey, onBack, t, lang }) {
     setCurrent(item)
     setOptions(getOptions(item, items, Math.min(3, items.length)))
     setFeedback(''); setSelected(null); setDisabled(true); setSpeaking(true)
-
-    // Build the speech text
-    let speechText
-    if (isAlphabet) {
-      const word = t.categories?.alphabet?.[item.name] || item.word || item.name
-      const forWord = t.forWord || 'for'
-      speechText = `${item.name}, ${forWord} ${word}`
-    } else {
-      speechText = getItemName(t, categoryKey, item)
-    }
-    
-    // For animals, also say the sound after the name
-    if (isAnimal && item.sound) {
-      await speakPrompt(speechText, lang)
-      // Small delay then say the animal sound
-      await new Promise(r => setTimeout(r, 300))
-      speakName(item.sound, lang)
-      await new Promise(r => setTimeout(r, 800))
-    } else {
-      await speakPrompt(speechText, lang)
-    }
-    
+    await speakAnswer(t, categoryKey, item, lang)
     setSpeaking(false)
     setDisabled(false)
-  }, [getNext, items, t, lang, categoryKey, isAlphabet, isAnimal])
+  }, [getNext, items, t, lang, categoryKey])
 
   useEffect(() => { newRound() }, [])
 
@@ -103,70 +101,34 @@ function EasyMode({ categoryKey, onBack, t, lang }) {
     if (opt.name === current.name) {
       setScore(s => s + 1); setFeedback(t.correct)
       playCorrectSound(name, lang)
-      if (isAnimal && current.sound) {
-        setTimeout(() => speakName(current.sound, lang), 800)
-      }
+      if (isAnimal && current.sound) setTimeout(() => speakName(current.sound, lang), 800)
     } else {
       setFeedback(t.tryAgain(name))
       playWrongSound(name, lang)
     }
     setTimeout(() => {
-      if (round >= ROUNDS_PER_LEVEL) {
-        setGameOver(true); playLevelUpSound(lang)
-      } else { setRound(r => r + 1); newRound() }
+      if (round >= ROUNDS_PER_LEVEL) { setGameOver(true); playLevelUpSound(lang) }
+      else { setRound(r => r + 1); newRound() }
     }, 1800)
   }
 
-  if (gameOver) {
-    const emoji = score >= 8 ? '🏆' : score >= 5 ? '⭐' : '💪'
-    return (
-      <div className="result-screen">
-        <div className="result-emoji">{emoji}</div>
-        <div className="result-score">{score} / {ROUNDS_PER_LEVEL}</div>
-        <div className="result-message">
-          {score >= 8 ? (t.amazing || 'Amazing!') : score >= 5 ? (t.keepPracticing || 'Keep practicing!') : (t.niceTry || 'Nice try!')}
-        </div>
-        <button className="play-again-btn" onClick={() => {
-          setRound(1); setScore(0); setGameOver(false)
-          queue.current = createQueue(items)
-          newRound()
-        }}>{t.playAgain}</button>
-        <br /><br />
-        <button className="play-again-btn" style={{ background: '#aaa' }} onClick={onBack}>{t.home}</button>
-      </div>
-    )
-  }
+  if (gameOver) return <ResultScreen score={score} total={ROUNDS_PER_LEVEL} t={t} onReplay={() => { setRound(1); setScore(0); setGameOver(false); queue.current = createQueue(items); newRound() }} onBack={onBack} />
 
   const currentName = current ? getItemName(t, categoryKey, current) : ''
-  const promptText = isAlphabet && current
-    ? getAlphabetLabel(t, current)
-    : currentName
+  const promptText = isAlphabet && current ? getAlphabetLabel(t, current) : currentName
 
   return (
     <>
       <div className="round-info">{t.roundXofY(round, ROUNDS_PER_LEVEL)}</div>
       <div style={{ textAlign: 'center', fontSize: '0.9rem', color: '#4CAF50', fontWeight: '600' }}>⭐ {score}</div>
       
-      {speaking && (
-        <div style={{
-          textAlign: 'center', padding: '8px', margin: '4px 12px',
-          background: 'linear-gradient(135deg, #e3f2fd, #bbdefb)', borderRadius: '12px',
-          fontSize: '1.1rem', fontWeight: '600', color: '#1565C0',
-          animation: 'pulse 1s ease-in-out infinite',
-        }}>
-          🔊 {t.choosePrompt ? t.choosePrompt(promptText) : `Choose ${promptText}!`}
-        </div>
-      )}
+      {speaking && <SpeakingIndicator text={t.choosePrompt ? t.choosePrompt(promptText) : `Choose ${promptText}!`} />}
       
       <div className="display-area">
         {current && (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '5rem', lineHeight: 1.2 }}>{current.emoji}</div>
-            {isAlphabet && (
-              <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#FF6B6B', marginTop: '8px' }}>
-                {current.name}
-              </div>
-            )}
+            {isAlphabet && <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#FF6B6B', marginTop: '8px' }}>{current.name}</div>}
             <div style={{ fontSize: '1.2rem', fontWeight: '700', color: '#333', marginTop: '8px' }}>
               {isAlphabet ? getAlphabetLabel(t, current) : currentName}
             </div>
@@ -187,15 +149,7 @@ function EasyMode({ categoryKey, onBack, t, lang }) {
           return (
             <button key={opt.name}
               className={`option-btn ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                padding: '10px 6px', minHeight: '90px', borderRadius: '16px',
-                border: isCorrect ? '3px solid #28a745' : isWrong ? '3px solid #ff3333' : '3px solid #e0e0e0',
-                background: isCorrect ? '#e8f5e9' : isWrong ? '#fbe9e7' : '#fff',
-                cursor: disabled ? 'default' : 'pointer', transition: 'all 0.2s',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                opacity: disabled && !isSelected ? 0.6 : 1,
-              }}
+              style={optionStyle(isCorrect, isWrong, disabled, isSelected)}
               onClick={() => handleAnswer(opt)}
             >
               <span style={{ fontSize: '2.5rem' }}>{opt.emoji}</span>
@@ -211,7 +165,8 @@ function EasyMode({ categoryKey, onBack, t, lang }) {
   )
 }
 
-// ============ MEDIUM MODE: Voice says name AFTER child taps ============
+// ============ MEDIUM MODE ============
+// Voice says name BEFORE tap, shows emoji (no name text on display), 4 options with emoji+text
 function MediumMode({ categoryKey, onBack, t, lang }) {
   const items = CATEGORIES[categoryKey].items
   const isAlphabet = categoryKey === 'alphabet'
@@ -223,7 +178,8 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
   const [options, setOptions] = useState([])
   const [feedback, setFeedback] = useState('')
   const [selected, setSelected] = useState(null)
-  const [disabled, setDisabled] = useState(false)
+  const [disabled, setDisabled] = useState(true)
+  const [speaking, setSpeaking] = useState(false)
   const [gameOver, setGameOver] = useState(false)
   const queue = useRef([])
 
@@ -232,13 +188,16 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
     return queue.current.pop()
   }, [items])
 
-  const newRound = useCallback(() => {
+  const newRound = useCallback(async () => {
     const item = getNext()
     setCurrent(item)
-    // More options in medium = harder
     setOptions(getOptions(item, items, Math.min(4, items.length)))
-    setFeedback(''); setSelected(null); setDisabled(false)
-  }, [getNext, items])
+    setFeedback(''); setSelected(null); setDisabled(true); setSpeaking(true)
+    // Voice says the answer BEFORE child taps
+    await speakAnswer(t, categoryKey, item, lang)
+    setSpeaking(false)
+    setDisabled(false)
+  }, [getNext, items, t, lang, categoryKey])
 
   useEffect(() => { newRound() }, [])
 
@@ -249,60 +208,43 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
     if (opt.name === current.name) {
       setScore(s => s + 1); setFeedback(t.correct)
       playCorrectSound(name, lang)
-      if (isAnimal && current.sound) {
-        setTimeout(() => speakName(current.sound, lang), 800)
-      }
+      if (isAnimal && current.sound) setTimeout(() => speakName(current.sound, lang), 800)
     } else {
       setFeedback(t.tryAgain(name))
       playWrongSound(name, lang)
     }
     setTimeout(() => {
-      if (round >= ROUNDS_PER_LEVEL) {
-        setGameOver(true); playLevelUpSound(lang)
-      } else { setRound(r => r + 1); newRound() }
+      if (round >= ROUNDS_PER_LEVEL) { setGameOver(true); playLevelUpSound(lang) }
+      else { setRound(r => r + 1); newRound() }
     }, 1800)
   }
 
-  if (gameOver) {
-    const emoji = score >= 8 ? '🏆' : score >= 5 ? '⭐' : '💪'
-    return (
-      <div className="result-screen">
-        <div className="result-emoji">{emoji}</div>
-        <div className="result-score">{score} / {ROUNDS_PER_LEVEL}</div>
-        <div className="result-message">
-          {score >= 8 ? (t.amazing || 'Amazing!') : score >= 5 ? (t.keepPracticing || 'Keep practicing!') : (t.niceTry || 'Nice try!')}
-        </div>
-        <button className="play-again-btn" onClick={() => {
-          setRound(1); setScore(0); setGameOver(false)
-          queue.current = createQueue(items)
-          newRound()
-        }}>{t.playAgain}</button>
-        <br /><br />
-        <button className="play-again-btn" style={{ background: '#aaa' }} onClick={onBack}>{t.home}</button>
-      </div>
-    )
-  }
+  if (gameOver) return <ResultScreen score={score} total={ROUNDS_PER_LEVEL} t={t} onReplay={() => { setRound(1); setScore(0); setGameOver(false); queue.current = createQueue(items); newRound() }} onBack={onBack} />
 
   const currentName = current ? getItemName(t, categoryKey, current) : ''
+  const promptText = isAlphabet && current ? getAlphabetLabel(t, current) : currentName
 
   return (
     <>
       <div className="round-info">{t.roundXofY(round, ROUNDS_PER_LEVEL)}</div>
       <div style={{ textAlign: 'center', fontSize: '0.9rem', color: '#4CAF50', fontWeight: '600' }}>⭐ {score}</div>
       
-      {/* Show the emoji but NO name - child must recognize it */}
+      {speaking && <SpeakingIndicator text={t.choosePrompt ? t.choosePrompt(promptText) : `Choose ${promptText}!`} />}
+      
+      {/* Show emoji + the name clearly so kids learn */}
       <div className="display-area">
         {current && (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '5rem', lineHeight: 1.2 }}>{current.emoji}</div>
-            {isAlphabet && (
-              <div style={{ fontSize: '3rem', fontWeight: '800', color: '#FF6B6B', marginTop: '8px' }}>
-                {current.name}
+            {isAlphabet && <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#FF6B6B', marginTop: '8px' }}>{current.name}</div>}
+            <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#333', marginTop: '8px' }}>
+              {isAlphabet ? getAlphabetLabel(t, current) : currentName}
+            </div>
+            {isAnimal && current.sound && (
+              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px', fontStyle: 'italic' }}>
+                "{current.sound}"
               </div>
             )}
-            <div style={{ fontSize: '1rem', color: '#888', marginTop: '8px' }}>
-              {isAlphabet ? (t.whatLetterFor || 'What is this letter for?') : (t.whatIsThis || 'What is this?')}
-            </div>
           </div>
         )}
       </div>
@@ -315,15 +257,7 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
           return (
             <button key={opt.name}
               className={`option-btn ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                padding: '10px 6px', minHeight: '80px', borderRadius: '16px',
-                border: isCorrect ? '3px solid #28a745' : isWrong ? '3px solid #ff3333' : '3px solid #e0e0e0',
-                background: isCorrect ? '#e8f5e9' : isWrong ? '#fbe9e7' : '#fff',
-                cursor: disabled ? 'default' : 'pointer', transition: 'all 0.2s',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                opacity: disabled && !isSelected ? 0.6 : 1,
-              }}
+              style={optionStyle(isCorrect, isWrong, disabled, isSelected)}
               onClick={() => handleAnswer(opt)}
             >
               <span style={{ fontSize: '2rem' }}>{opt.emoji}</span>
@@ -339,7 +273,8 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
   )
 }
 
-// ============ HARD MODE: Text only, no emoji hints ============
+// ============ HARD MODE ============
+// Voice says name BEFORE tap, shows emoji + name, timer, 4 text-only options (no emoji hints in buttons)
 function HardMode({ categoryKey, onBack, t, lang }) {
   const items = CATEGORIES[categoryKey].items
   const isAlphabet = categoryKey === 'alphabet'
@@ -351,7 +286,8 @@ function HardMode({ categoryKey, onBack, t, lang }) {
   const [options, setOptions] = useState([])
   const [feedback, setFeedback] = useState('')
   const [selected, setSelected] = useState(null)
-  const [disabled, setDisabled] = useState(false)
+  const [disabled, setDisabled] = useState(true)
+  const [speaking, setSpeaking] = useState(false)
   const [timer, setTimer] = useState(10)
   const [gameOver, setGameOver] = useState(false)
   const timerRef = useRef(null)
@@ -362,18 +298,22 @@ function HardMode({ categoryKey, onBack, t, lang }) {
     return queue.current.pop()
   }, [items])
 
-  const newRound = useCallback(() => {
+  const newRound = useCallback(async () => {
     const item = getNext()
     setCurrent(item)
     setOptions(getOptions(item, items, Math.min(4, items.length)))
-    setFeedback(''); setSelected(null); setDisabled(false); setTimer(10)
-  }, [getNext, items])
+    setFeedback(''); setSelected(null); setDisabled(true); setSpeaking(true); setTimer(10)
+    // Voice says the answer BEFORE child taps — then timer starts
+    await speakAnswer(t, categoryKey, item, lang)
+    setSpeaking(false)
+    setDisabled(false)
+  }, [getNext, items, t, lang, categoryKey])
 
   useEffect(() => { newRound() }, [])
 
-  // Timer
+  // Timer only starts when not speaking (disabled=false)
   useEffect(() => {
-    if (disabled || gameOver) return
+    if (disabled || gameOver || speaking) return
     if (timer <= 0) {
       setDisabled(true)
       const name = getItemName(t, categoryKey, current)
@@ -387,7 +327,7 @@ function HardMode({ categoryKey, onBack, t, lang }) {
     }
     timerRef.current = setTimeout(() => setTimer(tl => tl - 1), 1000)
     return () => clearTimeout(timerRef.current)
-  }, [timer, disabled, gameOver])
+  }, [timer, disabled, gameOver, speaking])
 
   const handleAnswer = (opt) => {
     if (disabled) return
@@ -398,6 +338,7 @@ function HardMode({ categoryKey, onBack, t, lang }) {
       const bonus = timer >= 7 ? 3 : timer >= 4 ? 2 : 1
       setScore(s => s + bonus); setFeedback(`${t.correct} +${bonus}`)
       playCorrectSound(name, lang)
+      if (isAnimal && current.sound) setTimeout(() => speakName(current.sound, lang), 800)
     } else {
       setFeedback(t.tryAgain(name))
       playWrongSound(name, lang)
@@ -411,24 +352,11 @@ function HardMode({ categoryKey, onBack, t, lang }) {
   if (gameOver) {
     const maxScore = ROUNDS_PER_LEVEL * 3
     const pct = score / maxScore
-    const emoji = pct >= 0.7 ? '🏆' : pct >= 0.4 ? '⭐' : '💪'
-    return (
-      <div className="result-screen">
-        <div className="result-emoji">{emoji}</div>
-        <div className="result-score">{score} {t.score || 'points'}</div>
-        <div className="result-message">
-          {pct >= 0.7 ? (t.amazing || 'Amazing!') : pct >= 0.4 ? (t.keepPracticing || 'Keep practicing!') : (t.niceTry || 'Nice try!')}
-        </div>
-        <button className="play-again-btn" onClick={() => {
-          setRound(1); setScore(0); setGameOver(false)
-          queue.current = createQueue(items)
-          newRound()
-        }}>{t.playAgain}</button>
-        <br /><br />
-        <button className="play-again-btn" style={{ background: '#aaa' }} onClick={onBack}>{t.home}</button>
-      </div>
-    )
+    return <ResultScreen score={score} total={maxScore} suffix={t.score || 'points'} pct={pct} t={t} onReplay={() => { setRound(1); setScore(0); setGameOver(false); queue.current = createQueue(items); newRound() }} onBack={onBack} />
   }
+
+  const currentName = current ? getItemName(t, categoryKey, current) : ''
+  const promptText = isAlphabet && current ? getAlphabetLabel(t, current) : currentName
 
   return (
     <>
@@ -438,24 +366,27 @@ function HardMode({ categoryKey, onBack, t, lang }) {
         <span>⭐ {score}</span>
       </div>
       
-      {/* Show ONLY emoji, no text name */}
+      {speaking && <SpeakingIndicator text={t.choosePrompt ? t.choosePrompt(promptText) : `Choose ${promptText}!`} />}
+      
+      {/* Show emoji + name clearly */}
       <div className="display-area">
         {current && (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '5rem', lineHeight: 1.2 }}>{current.emoji}</div>
-            {isAlphabet && (
-              <div style={{ fontSize: '3rem', fontWeight: '800', color: '#FF6B6B', marginTop: '8px' }}>
-                {current.name}
+            {isAlphabet && <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#FF6B6B', marginTop: '8px' }}>{current.name}</div>}
+            <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#333', marginTop: '8px' }}>
+              {isAlphabet ? getAlphabetLabel(t, current) : currentName}
+            </div>
+            {isAnimal && current.sound && (
+              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px', fontStyle: 'italic' }}>
+                "{current.sound}"
               </div>
             )}
-            <div style={{ fontSize: '1rem', color: '#888', marginTop: '8px' }}>
-              {t.whatIsThis || 'What is this?'}
-            </div>
           </div>
         )}
       </div>
 
-      {/* Options as TEXT only (no emoji) for harder recognition */}
+      {/* Hard: text-only options (no emoji in buttons) */}
       <div className="options-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
         {options.map(opt => {
           const isSelected = selected === opt.name
@@ -486,6 +417,49 @@ function HardMode({ categoryKey, onBack, t, lang }) {
   )
 }
 
+// ============ SHARED COMPONENTS ============
+
+function SpeakingIndicator({ text }) {
+  return (
+    <div style={{
+      textAlign: 'center', padding: '10px', margin: '6px 12px',
+      background: 'linear-gradient(135deg, #e3f2fd, #bbdefb)', borderRadius: '14px',
+      fontSize: '1.1rem', fontWeight: '600', color: '#1565C0',
+      animation: 'pulse 1s ease-in-out infinite',
+      boxShadow: '0 2px 8px rgba(21,101,192,0.15)',
+    }}>
+      🔊 {text}
+    </div>
+  )
+}
+
+function optionStyle(isCorrect, isWrong, disabled, isSelected) {
+  return {
+    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+    padding: '10px 6px', minHeight: '90px', borderRadius: '16px',
+    border: isCorrect ? '3px solid #28a745' : isWrong ? '3px solid #ff3333' : '3px solid #e0e0e0',
+    background: isCorrect ? '#e8f5e9' : isWrong ? '#fbe9e7' : '#fff',
+    cursor: disabled ? 'default' : 'pointer', transition: 'all 0.2s',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    opacity: disabled && !isSelected ? 0.6 : 1,
+  }
+}
+
+function ResultScreen({ score, total, suffix, pct, t, onReplay, onBack }) {
+  const ratio = pct !== undefined ? pct : score / total
+  const emoji = ratio >= 0.7 ? '🏆' : ratio >= 0.4 ? '⭐' : '💪'
+  const msg = ratio >= 0.7 ? (t.amazing || 'Amazing!') : ratio >= 0.4 ? (t.keepPracticing || 'Keep practicing!') : (t.niceTry || 'Nice try!')
+  return (
+    <div className="result-screen">
+      <div className="result-emoji">{emoji}</div>
+      <div className="result-score">{score}{suffix ? ` ${suffix}` : ` / ${total}`}</div>
+      <div className="result-message">{msg}</div>
+      <button className="play-again-btn" onClick={onReplay}>{t.playAgain}</button>
+      <br /><br />
+      <button className="play-again-btn" style={{ background: '#aaa' }} onClick={onBack}>{t.home}</button>
+    </div>
+  )
+}
 
 // ============ MAIN COMPONENT ============
 export default function ImageQuiz({ categoryKey, onBack }) {
@@ -493,12 +467,11 @@ export default function ImageQuiz({ categoryKey, onBack }) {
   const category = CATEGORIES[categoryKey]
   const [diffLevel, setDiffLevel] = useState(null)
 
-  // Get category title
   const catTitle = t.categoryTitles?.[categoryKey] || (categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1))
 
   const DIFFICULTIES = [
     { key: 'easy', emoji: '🔊', desc: t.easyQuizDesc || 'Voice guides you! Hear the name, then tap it.' },
-    { key: 'medium', emoji: '🧩', desc: t.mediumQuizDesc || 'See the picture, pick the right name!' },
+    { key: 'medium', emoji: '🧩', desc: t.mediumQuizDesc || 'More options to choose from!' },
     { key: 'hard', emoji: '⚡', desc: t.hardQuizDesc || 'Speed challenge with timer!' },
   ]
 
