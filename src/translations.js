@@ -77,6 +77,7 @@ export const translations = {
     easyQuizDesc: 'Voice guides you! Hear the name, then tap it.',
     mediumQuizDesc: 'See the picture, pick the right name!',
     hardQuizDesc: 'Speed challenge with timer!',
+    tapToHearSound: 'Tap to hear the sound!',
     categoryTitles: {
       animals: 'Animals',
       fruits: 'Fruits',
@@ -212,6 +213,7 @@ export const translations = {
     easyQuizDesc: '!آواز آپ کی رہنمائی کرے گی! نام سنیں، پھر تھپتھپائیں',
     mediumQuizDesc: '!تصویر دیکھیں، صحیح نام چنیں',
     hardQuizDesc: '!ٹائمر کے ساتھ سپیڈ چیلنج',
+    tapToHearSound: '!آواز سننے کے لیے تھپتھپائیں',
     categoryTitles: {
       animals: 'جانور',
       fruits: 'پھل',
@@ -347,6 +349,7 @@ export const translations = {
     easyQuizDesc: 'आवाज़ मदद करेगी! नाम सुनो, फिर टैप करो।',
     mediumQuizDesc: 'तस्वीर देखो, सही नाम चुनो!',
     hardQuizDesc: 'टाइमर के साथ स्पीड चैलेंज!',
+    tapToHearSound: 'आवाज़ सुनने के लिए टैप करो!',
     categoryTitles: {
       animals: 'जानवर',
       fruits: 'फल',

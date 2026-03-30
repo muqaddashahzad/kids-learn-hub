@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useLanguage } from '../LanguageContext'
 import { playCorrectSound, playWrongSound, playLevelUpSound, speakPrompt, speakName } from '../sounds'
+import { playAnimalSound } from '../animalSounds'
 import { CATEGORIES } from '../data/categories'
 
 const ROUNDS_PER_LEVEL = 10
@@ -47,16 +48,10 @@ function buildSpeechText(t, categoryKey, item) {
   return getItemName(t, categoryKey, item)
 }
 
-// Speak the answer with optional animal sound
+// Speak the answer name (NO animal sound here - that plays only on tap)
 async function speakAnswer(t, categoryKey, item, lang) {
   const speechText = buildSpeechText(t, categoryKey, item)
   await speakPrompt(speechText, lang)
-  // For animals, also say the sound
-  if (categoryKey === 'animals' && item.sound) {
-    await new Promise(r => setTimeout(r, 400))
-    speakName(item.sound, lang)
-    await new Promise(r => setTimeout(r, 900))
-  }
 }
 
 // ============ EASY MODE ============
@@ -98,10 +93,11 @@ function EasyMode({ categoryKey, onBack, t, lang }) {
     if (disabled) return
     setDisabled(true); setSelected(opt.name)
     const name = getItemName(t, categoryKey, current)
+    // Play real animal sound when kid taps ANY animal option
+    if (isAnimal) playAnimalSound(opt.name)
     if (opt.name === current.name) {
       setScore(s => s + 1); setFeedback(t.correct)
       playCorrectSound(name, lang)
-      if (isAnimal && current.sound) setTimeout(() => speakName(current.sound, lang), 800)
     } else {
       setFeedback(t.tryAgain(name))
       playWrongSound(name, lang)
@@ -132,9 +128,9 @@ function EasyMode({ categoryKey, onBack, t, lang }) {
             <div style={{ fontSize: '1.2rem', fontWeight: '700', color: '#333', marginTop: '8px' }}>
               {isAlphabet ? getAlphabetLabel(t, current) : currentName}
             </div>
-            {isAnimal && current.sound && (
-              <div style={{ fontSize: '0.9rem', color: '#888', marginTop: '4px', fontStyle: 'italic' }}>
-                "{current.sound}"
+            {isAnimal && (
+              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px' }}>
+                🔊 {t.tapToHearSound || 'Tap to hear the sound!'}
               </div>
             )}
           </div>
@@ -166,7 +162,7 @@ function EasyMode({ categoryKey, onBack, t, lang }) {
 }
 
 // ============ MEDIUM MODE ============
-// Voice says name BEFORE tap, shows emoji (no name text on display), 4 options with emoji+text
+// Voice says name BEFORE tap, 4 options with emoji+text
 function MediumMode({ categoryKey, onBack, t, lang }) {
   const items = CATEGORIES[categoryKey].items
   const isAlphabet = categoryKey === 'alphabet'
@@ -193,7 +189,6 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
     setCurrent(item)
     setOptions(getOptions(item, items, Math.min(4, items.length)))
     setFeedback(''); setSelected(null); setDisabled(true); setSpeaking(true)
-    // Voice says the answer BEFORE child taps
     await speakAnswer(t, categoryKey, item, lang)
     setSpeaking(false)
     setDisabled(false)
@@ -205,10 +200,10 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
     if (disabled) return
     setDisabled(true); setSelected(opt.name)
     const name = getItemName(t, categoryKey, current)
+    if (isAnimal) playAnimalSound(opt.name)
     if (opt.name === current.name) {
       setScore(s => s + 1); setFeedback(t.correct)
       playCorrectSound(name, lang)
-      if (isAnimal && current.sound) setTimeout(() => speakName(current.sound, lang), 800)
     } else {
       setFeedback(t.tryAgain(name))
       playWrongSound(name, lang)
@@ -231,7 +226,6 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
       
       {speaking && <SpeakingIndicator text={t.choosePrompt ? t.choosePrompt(promptText) : `Choose ${promptText}!`} />}
       
-      {/* Show emoji + the name clearly so kids learn */}
       <div className="display-area">
         {current && (
           <div style={{ textAlign: 'center' }}>
@@ -240,9 +234,9 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
             <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#333', marginTop: '8px' }}>
               {isAlphabet ? getAlphabetLabel(t, current) : currentName}
             </div>
-            {isAnimal && current.sound && (
-              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px', fontStyle: 'italic' }}>
-                "{current.sound}"
+            {isAnimal && (
+              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px' }}>
+                🔊 {t.tapToHearSound || 'Tap to hear the sound!'}
               </div>
             )}
           </div>
@@ -334,11 +328,11 @@ function HardMode({ categoryKey, onBack, t, lang }) {
     setDisabled(true); setSelected(opt.name)
     clearTimeout(timerRef.current)
     const name = getItemName(t, categoryKey, current)
+    if (isAnimal) playAnimalSound(opt.name)
     if (opt.name === current.name) {
       const bonus = timer >= 7 ? 3 : timer >= 4 ? 2 : 1
       setScore(s => s + bonus); setFeedback(`${t.correct} +${bonus}`)
       playCorrectSound(name, lang)
-      if (isAnimal && current.sound) setTimeout(() => speakName(current.sound, lang), 800)
     } else {
       setFeedback(t.tryAgain(name))
       playWrongSound(name, lang)
@@ -377,9 +371,9 @@ function HardMode({ categoryKey, onBack, t, lang }) {
             <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#333', marginTop: '8px' }}>
               {isAlphabet ? getAlphabetLabel(t, current) : currentName}
             </div>
-            {isAnimal && current.sound && (
-              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px', fontStyle: 'italic' }}>
-                "{current.sound}"
+            {isAnimal && (
+              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px' }}>
+                🔊 {t.tapToHearSound || 'Tap to hear the sound!'}
               </div>
             )}
           </div>

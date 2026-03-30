@@ -43,17 +43,37 @@ function getBestVoice(langCode) {
   const voices = window.speechSynthesis.getVoices()
   if (!voices.length) return null
   
-  // Prefer natural/enhanced voices, avoid "Microsoft" buzzy ones on Windows laptops
-  const preferred = voices.filter(v => v.lang.startsWith(langCode.split('-')[0]))
+  const langBase = langCode.split('-')[0] // e.g. 'ur' from 'ur-PK'
+  const preferred = voices.filter(v => v.lang.startsWith(langBase))
   const natural = preferred.find(v => 
     v.name.toLowerCase().includes('natural') || 
     v.name.toLowerCase().includes('enhanced') ||
     v.name.toLowerCase().includes('premium') ||
     v.name.toLowerCase().includes('google')
   )
-  const result = natural || preferred.find(v => v.lang === langCode) || preferred[0] || null
+  let result = natural || preferred.find(v => v.lang === langCode) || preferred[0] || null
+  
+  // Fallback: if no Urdu/Hindi voice found, try Hindi for Urdu and vice versa (similar scripts)
+  if (!result && langBase === 'ur') {
+    result = voices.find(v => v.lang.startsWith('hi')) || null
+  }
+  if (!result && langBase === 'hi') {
+    result = voices.find(v => v.lang.startsWith('ur')) || null
+  }
+  // Last resort: use English voice (better than silence!)
+  if (!result) {
+    result = voices.find(v => v.lang.startsWith('en')) || voices[0] || null
+  }
+  
   if (result) voiceCache[langCode] = result
   return result
+}
+
+// Check if a language voice is available
+export function hasVoice(lang) {
+  const voices = window.speechSynthesis.getVoices()
+  const langBase = (LANG_VOICE[lang] || 'en-US').split('-')[0]
+  return voices.some(v => v.lang.startsWith(langBase))
 }
 
 // Preload voices
@@ -75,14 +95,19 @@ function speak(text, lang = 'en', rate = 0.85) {
     setTimeout(() => {
       const utterance = new SpeechSynthesisUtterance(text)
       const voiceLang = LANG_VOICE[lang] || 'en-US'
-      utterance.lang = voiceLang
-      utterance.rate = rate
-      utterance.pitch = 1.15 // slightly higher pitch for kids, but not too high
-      utterance.volume = 0.85 // slightly lower to avoid clipping
       
-      // Try to use the best available voice
+      // Always set a voice - getBestVoice now has English fallback
       const voice = getBestVoice(voiceLang)
-      if (voice) utterance.voice = voice
+      if (voice) {
+        utterance.voice = voice
+        utterance.lang = voice.lang // use the actual voice's language
+      } else {
+        utterance.lang = voiceLang
+      }
+      
+      utterance.rate = rate
+      utterance.pitch = 1.15
+      utterance.volume = 0.85
       
       window.speechSynthesis.speak(utterance)
     }, 50)
@@ -95,24 +120,41 @@ export function speakPrompt(name, lang = 'en') {
   return new Promise((resolve) => {
     try {
       window.speechSynthesis.cancel()
-      const phrases = {
-        en: `Choose ${name}`,
-        ur: `${name} چنیں`,
-        hi: `${name} चुनो`,
+      const voiceLang = LANG_VOICE[lang] || 'en-US'
+      const voice = getBestVoice(voiceLang)
+      
+      // Check if we have a native voice for this language
+      const voiceLangBase = voice ? voice.lang.split('-')[0] : 'en'
+      const requestedBase = voiceLang.split('-')[0]
+      const hasNativeVoice = voiceLangBase === requestedBase
+      
+      // If no native Urdu/Hindi voice, speak the English name instead of silent Urdu text
+      let text
+      if (hasNativeVoice) {
+        const phrases = {
+          en: `Choose ${name}`,
+          ur: `${name} چنیں`,
+          hi: `${name} चुनो`,
+        }
+        text = phrases[lang] || phrases.en
+      } else {
+        // Fallback: speak just the name in whatever voice we have
+        text = `Choose ${name}`
       }
-      const text = phrases[lang] || phrases.en
+      
       setTimeout(() => {
         const utterance = new SpeechSynthesisUtterance(text)
-        const voiceLang = LANG_VOICE[lang] || 'en-US'
-        utterance.lang = voiceLang
-        utterance.rate = 0.8 // slower for kids to hear clearly
+        if (voice) {
+          utterance.voice = voice
+          utterance.lang = voice.lang
+        } else {
+          utterance.lang = voiceLang
+        }
+        utterance.rate = 0.8
         utterance.pitch = 1.2
         utterance.volume = 0.9
-        const voice = getBestVoice(voiceLang)
-        if (voice) utterance.voice = voice
         utterance.onend = () => resolve()
         utterance.onerror = () => resolve()
-        // Safety timeout in case onend never fires
         setTimeout(resolve, 3000)
         window.speechSynthesis.speak(utterance)
       }, 50)
@@ -120,19 +162,23 @@ export function speakPrompt(name, lang = 'en') {
   })
 }
 
-// Speak just the name of a color/shape clearly (used after answer in medium/hard)
+// Speak just the name of a color/shape clearly
 export function speakName(name, lang = 'en') {
   try {
     window.speechSynthesis.cancel()
     setTimeout(() => {
       const utterance = new SpeechSynthesisUtterance(name)
       const voiceLang = LANG_VOICE[lang] || 'en-US'
-      utterance.lang = voiceLang
+      const voice = getBestVoice(voiceLang)
+      if (voice) {
+        utterance.voice = voice
+        utterance.lang = voice.lang
+      } else {
+        utterance.lang = voiceLang
+      }
       utterance.rate = 0.8
       utterance.pitch = 1.2
       utterance.volume = 0.9
-      const voice = getBestVoice(voiceLang)
-      if (voice) utterance.voice = voice
       window.speechSynthesis.speak(utterance)
     }, 50)
   } catch(e) {}
