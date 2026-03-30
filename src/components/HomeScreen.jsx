@@ -14,6 +14,14 @@ const CARD_STYLES = {
   ballooncolors: { border: '#FF6B6B', bg: 'linear-gradient(135deg, #fff5f5, #ffe0e0)' },
   balloonshapes: { border: '#4ECDC4', bg: 'linear-gradient(135deg, #f0fffe, #d0f5f2)' },
   tools: { border: '#90A4AE', bg: 'linear-gradient(135deg, #f5f5f5, #e0e0e0)' },
+  counting: { border: '#FF7043', bg: 'linear-gradient(135deg, #fff3e0, #ffe0b2)' },
+  music: { border: '#AB47BC', bg: 'linear-gradient(135deg, #f3e5f5, #e1bee7)' },
+  tracing: { border: '#42A5F5', bg: 'linear-gradient(135deg, #e3f2fd, #bbdefb)' },
+  wordbuilder: { border: '#26A69A', bg: 'linear-gradient(135deg, #e0f2f1, #b2dfdb)' },
+  oddoneout: { border: '#EF5350', bg: 'linear-gradient(135deg, #ffebee, #ffcdd2)' },
+  math: { border: '#FFA726', bg: 'linear-gradient(135deg, #fff8e1, #ffecb3)' },
+  colormixing: { border: '#EC407A', bg: 'linear-gradient(135deg, #fce4ec, #f8bbd0)' },
+  matchpairs: { border: '#5C6BC0', bg: 'linear-gradient(135deg, #e8eaf6, #c5cae9)' },
   sudoku: { border: '#84fab0', bg: 'linear-gradient(135deg, #f0fff4, #d4f5e0)' },
 }
 
@@ -76,6 +84,47 @@ export default function HomeScreen({ onNavigate }) {
       id: 'tools', emoji: '🔧', age: t.ages24, cls: 'tools',
       title: t.categoryTitles?.tools || 'Tools',
       desc: t.categoryDescs?.tools || 'Learn tool names!',
+    },
+    // Fun games
+    {
+      id: 'counting', emoji: '🔢', age: t.ages24, cls: 'counting',
+      title: t.countingTitle || 'Counting',
+      desc: t.countingDesc || 'Count objects and pick the number!',
+    },
+    {
+      id: 'music', emoji: '🎵', age: t.ages24, cls: 'music',
+      title: t.musicTitle || 'Music & Sounds',
+      desc: t.musicDesc || 'Play piano, xylophone & drums!',
+    },
+    {
+      id: 'tracing', emoji: '✍️', age: t.ages24, cls: 'tracing',
+      title: t.tracingTitle || 'Trace Letters',
+      desc: t.tracingDesc || 'Trace ABC with your finger!',
+    },
+    {
+      id: 'word-builder', emoji: '🔤', age: t.ages24, cls: 'wordbuilder',
+      title: t.wordBuilderTitle || 'Word Builder',
+      desc: t.wordBuilderDesc || 'Spell words by tapping letters!',
+    },
+    {
+      id: 'odd-one-out', emoji: '🎯', age: t.ages24, cls: 'oddoneout',
+      title: t.oddOneOutTitle || 'Odd One Out',
+      desc: t.oddOneOutDesc || 'Find which one doesn\'t belong!',
+    },
+    {
+      id: 'math', emoji: '🧮', age: t.ages24, cls: 'math',
+      title: t.mathTitle || 'Simple Math',
+      desc: t.mathDesc || 'Fun addition with pictures!',
+    },
+    {
+      id: 'color-mixing', emoji: '🌈', age: t.ages24, cls: 'colormixing',
+      title: t.colorMixingTitle || 'Color Mixing',
+      desc: t.colorMixingDesc || 'Mix colors to make new ones!',
+    },
+    {
+      id: 'match-pairs', emoji: '🃏', age: t.ages24, cls: 'matchpairs',
+      title: t.matchPairsTitle || 'Match Pairs',
+      desc: t.matchPairsDesc || 'Flip cards and find matching pairs!',
     },
     // Sudoku
     {
