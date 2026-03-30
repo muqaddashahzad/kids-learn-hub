@@ -71,17 +71,6 @@ export default function HomeScreen({ onNavigate }) {
       title: t.categoryTitles?.objects || 'Everyday Objects',
       desc: t.categoryDescs?.objects || 'Learn everyday object names!',
     },
-    // Pop games
-    {
-      id: 'balloon-colors', emoji: '🎈', age: t.ages24, cls: 'ballooncolors',
-      title: t.popColors || 'Balloon Pop!',
-      desc: t.popColorsDesc || 'Pop the right color balloons!',
-    },
-    {
-      id: 'balloon-shapes', emoji: '🫧', age: t.ages24, cls: 'balloonshapes',
-      title: t.popShapes || 'Shape Pop!',
-      desc: t.popShapesDesc || 'Pop the right falling shapes!',
-    },
     // Sudoku
     {
       id: 'sudoku', emoji: '🧩', title: t.sudoku, age: t.ages612,
