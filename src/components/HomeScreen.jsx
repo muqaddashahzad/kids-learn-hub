@@ -13,6 +13,7 @@ const CARD_STYLES = {
   objects: { border: '#4DB6AC', bg: 'linear-gradient(135deg, #e0f7fa, #b2dfdb)' },
   ballooncolors: { border: '#FF6B6B', bg: 'linear-gradient(135deg, #fff5f5, #ffe0e0)' },
   balloonshapes: { border: '#4ECDC4', bg: 'linear-gradient(135deg, #f0fffe, #d0f5f2)' },
+  tools: { border: '#90A4AE', bg: 'linear-gradient(135deg, #f5f5f5, #e0e0e0)' },
   sudoku: { border: '#84fab0', bg: 'linear-gradient(135deg, #f0fff4, #d4f5e0)' },
 }
 
@@ -70,6 +71,11 @@ export default function HomeScreen({ onNavigate }) {
       id: 'objects', emoji: '🎒', age: t.ages24, cls: 'objects',
       title: t.categoryTitles?.objects || 'Everyday Objects',
       desc: t.categoryDescs?.objects || 'Learn everyday object names!',
+    },
+    {
+      id: 'tools', emoji: '🔧', age: t.ages24, cls: 'tools',
+      title: t.categoryTitles?.tools || 'Tools',
+      desc: t.categoryDescs?.tools || 'Learn tool names!',
     },
     // Sudoku
     {

@@ -86,6 +86,7 @@ export const translations = {
       kitchen: 'Kitchen Items',
       home: 'Home Items',
       objects: 'Everyday Objects',
+      tools: 'Tools',
     },
     categoryDescs: {
       animals: 'Learn animal names and sounds!',
@@ -95,6 +96,7 @@ export const translations = {
       kitchen: 'Learn kitchen item names!',
       home: 'Learn things found at home!',
       objects: 'Learn everyday object names!',
+      tools: 'Learn tool names!',
     },
     categories: {
       animals: {
@@ -132,6 +134,12 @@ export const translations = {
         Ball: 'Ball', Car: 'Car', Bus: 'Bus', Train: 'Train', Airplane: 'Airplane',
         Bicycle: 'Bicycle', Umbrella: 'Umbrella', Hat: 'Hat', Shoe: 'Shoe', Bag: 'Bag',
         Pencil: 'Pencil', Scissors: 'Scissors', Star: 'Star', Sun: 'Sun', Moon: 'Moon', Cloud: 'Cloud',
+      },
+      tools: {
+        Hammer: 'Hammer', Screwdriver: 'Screwdriver', Wrench: 'Wrench', Saw: 'Saw',
+        Drill: 'Drill', Axe: 'Axe', Paintbrush: 'Paintbrush', Ruler: 'Ruler',
+        Tape: 'Tape', Ladder: 'Ladder', Bucket: 'Bucket', Magnet: 'Magnet',
+        Flashlight: 'Flashlight', Lock: 'Lock',
       },
     },
   },
@@ -222,6 +230,7 @@ export const translations = {
       kitchen: 'باورچی خانے کی چیزیں',
       home: 'گھر کی چیزیں',
       objects: 'روزمرہ کی چیزیں',
+      tools: 'اوزار',
     },
     categoryDescs: {
       animals: '!جانوروں کے نام اور آوازیں سیکھیں',
@@ -231,6 +240,7 @@ export const translations = {
       kitchen: '!باورچی خانے کی چیزوں کے نام سیکھیں',
       home: '!گھر کی چیزوں کے نام سیکھیں',
       objects: '!روزمرہ چیزوں کے نام سیکھیں',
+      tools: '!اوزاروں کے نام سیکھیں',
     },
     categories: {
       animals: {
@@ -268,6 +278,12 @@ export const translations = {
         Ball: 'گیند', Car: 'گاڑی', Bus: 'بس', Train: 'ٹرین', Airplane: 'ہوائی جہاز',
         Bicycle: 'سائیکل', Umbrella: 'چھتری', Hat: 'ٹوپی', Shoe: 'جوتا', Bag: 'بیگ',
         Pencil: 'پنسل', Scissors: 'قینچی', Star: 'ستارہ', Sun: 'سورج', Moon: 'چاند', Cloud: 'بادل',
+      },
+      tools: {
+        Hammer: 'ہتھوڑا', Screwdriver: 'پیچ کس', Wrench: 'رنچ', Saw: 'آری',
+        Drill: 'ڈرل', Axe: 'کلہاڑی', Paintbrush: 'پینٹ برش', Ruler: 'فٹا',
+        Tape: 'ٹیپ', Ladder: 'سیڑھی', Bucket: 'بالٹی', Magnet: 'مقناطیس',
+        Flashlight: 'ٹارچ', Lock: 'تالا',
       },
     },
   },
@@ -358,6 +374,7 @@ export const translations = {
       kitchen: 'रसोई की चीज़ें',
       home: 'घर की चीज़ें',
       objects: 'रोज़मर्रा की चीज़ें',
+      tools: 'औज़ार',
     },
     categoryDescs: {
       animals: 'जानवरों के नाम और आवाज़ें सीखो!',
@@ -367,6 +384,7 @@ export const translations = {
       kitchen: 'रसोई की चीज़ों के नाम सीखो!',
       home: 'घर की चीज़ें सीखो!',
       objects: 'रोज़मर्रा की चीज़ों के नाम सीखो!',
+      tools: 'औज़ारों के नाम सीखो!',
     },
     categories: {
       animals: {
@@ -404,6 +422,12 @@ export const translations = {
         Ball: 'गेंद', Car: 'गाड़ी', Bus: 'बस', Train: 'ट्रेन', Airplane: 'हवाई जहाज़',
         Bicycle: 'साइकिल', Umbrella: 'छतरी', Hat: 'टोपी', Shoe: 'जूता', Bag: 'बैग',
         Pencil: 'पेंसिल', Scissors: 'कैंची', Star: 'तारा', Sun: 'सूरज', Moon: 'चाँद', Cloud: 'बादल',
+      },
+      tools: {
+        Hammer: 'हथौड़ा', Screwdriver: 'पेचकस', Wrench: 'रिंच', Saw: 'आरी',
+        Drill: 'ड्रिल', Axe: 'कुल्हाड़ी', Paintbrush: 'पेंट ब्रश', Ruler: 'पट्टी',
+        Tape: 'टेप', Ladder: 'सीढ़ी', Bucket: 'बाल्टी', Magnet: 'चुम्बक',
+        Flashlight: 'टॉर्च', Lock: 'ताला',
       },
     },
   }

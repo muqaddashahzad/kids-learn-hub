@@ -27,6 +27,7 @@ function App() {
         {screen === 'kitchen' && <ImageQuiz categoryKey="kitchen" onBack={() => setScreen('home')} />}
         {screen === 'home-items' && <ImageQuiz categoryKey="home" onBack={() => setScreen('home')} />}
         {screen === 'objects' && <ImageQuiz categoryKey="objects" onBack={() => setScreen('home')} />}
+        {screen === 'tools' && <ImageQuiz categoryKey="tools" onBack={() => setScreen('home')} />}
       </div>
     </LanguageProvider>
   )

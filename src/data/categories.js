@@ -158,7 +158,28 @@ export const CATEGORIES = {
       { name: 'Cloud', emoji: '☁️' },
     ]
   },
+  tools: {
+    key: 'tools',
+    emoji: '🔧',
+    icon: '🔧',
+    items: [
+      { name: 'Hammer', emoji: '🔨' },
+      { name: 'Screwdriver', emoji: '🪛' },
+      { name: 'Wrench', emoji: '🔧' },
+      { name: 'Saw', emoji: '🪚' },
+      { name: 'Drill', emoji: '🪛' },
+      { name: 'Axe', emoji: '🪓' },
+      { name: 'Paintbrush', emoji: '🖌️' },
+      { name: 'Ruler', emoji: '📏' },
+      { name: 'Tape', emoji: '🩹' },
+      { name: 'Ladder', emoji: '🪜' },
+      { name: 'Bucket', emoji: '🪣' },
+      { name: 'Magnet', emoji: '🧲' },
+      { name: 'Flashlight', emoji: '🔦' },
+      { name: 'Lock', emoji: '🔒' },
+    ]
+  },
 }
 
 // Category order for home screen
-export const CATEGORY_ORDER = ['animals', 'fruits', 'alphabet', 'vegetables', 'kitchen', 'home', 'objects']
+export const CATEGORY_ORDER = ['animals', 'fruits', 'alphabet', 'vegetables', 'kitchen', 'home', 'objects', 'tools']
