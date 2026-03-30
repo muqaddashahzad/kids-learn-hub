@@ -105,9 +105,10 @@ export const translations = {
         Frog: 'Frog', Bird: 'Bird', Fish: 'Fish', Monkey: 'Monkey', Bear: 'Bear', Rabbit: 'Rabbit',
       },
       fruits: {
-        Apple: 'Apple', Banana: 'Banana', Orange: 'Orange', Grapes: 'Grapes',
-        Strawberry: 'Strawberry', Watermelon: 'Watermelon', Mango: 'Mango', Pineapple: 'Pineapple',
-        Cherry: 'Cherry', Peach: 'Peach', Pear: 'Pear', Lemon: 'Lemon', Coconut: 'Coconut', Kiwi: 'Kiwi',
+        Apple: 'Apple', Banana: 'Banana', Orange: 'Orange', Mango: 'Mango',
+        Watermelon: 'Watermelon', Grapes: 'Grapes', Pomegranate: 'Pomegranate',
+        Guava: 'Guava', Papaya: 'Papaya', Lemon: 'Lemon', Coconut: 'Coconut',
+        Dates: 'Dates', Pineapple: 'Pineapple', Sugarcane: 'Sugarcane',
       },
       alphabet: {
         A: 'Apple', B: 'Bear', C: 'Cat', D: 'Dog', E: 'Elephant', F: 'Fish',
@@ -117,9 +118,10 @@ export const translations = {
         Y: 'Yo-yo', Z: 'Zebra',
       },
       vegetables: {
-        Carrot: 'Carrot', Tomato: 'Tomato', Corn: 'Corn', Broccoli: 'Broccoli',
-        Potato: 'Potato', Onion: 'Onion', Garlic: 'Garlic', Pepper: 'Pepper',
-        Cucumber: 'Cucumber', Eggplant: 'Eggplant', Mushroom: 'Mushroom', Lettuce: 'Lettuce',
+        Potato: 'Potato', Tomato: 'Tomato', Onion: 'Onion', Carrot: 'Carrot',
+        Pepper: 'Pepper', Eggplant: 'Eggplant', Garlic: 'Garlic', Cucumber: 'Cucumber',
+        Corn: 'Corn', Spinach: 'Spinach', Peas: 'Peas', Radish: 'Radish',
+        Pumpkin: 'Pumpkin', Cauliflower: 'Cauliflower',
       },
       kitchen: {
         Spoon: 'Spoon', Fork: 'Fork', Knife: 'Knife', Plate: 'Plate', Cup: 'Cup',
@@ -249,9 +251,10 @@ export const translations = {
         Frog: 'مینڈک', Bird: 'پرندہ', Fish: 'مچھلی', Monkey: 'بندر', Bear: 'ریچھ', Rabbit: 'خرگوش',
       },
       fruits: {
-        Apple: 'سیب', Banana: 'کیلا', Orange: 'مالٹا', Grapes: 'انگور',
-        Strawberry: 'اسٹرابیری', Watermelon: 'تربوز', Mango: 'آم', Pineapple: 'انناس',
-        Cherry: 'چیری', Peach: 'آڑو', Pear: 'ناشپاتی', Lemon: 'لیموں', Coconut: 'ناریل', Kiwi: 'کیوی',
+        Apple: 'سیب', Banana: 'کیلا', Orange: 'مالٹا', Mango: 'آم',
+        Watermelon: 'تربوز', Grapes: 'انگور', Pomegranate: 'انار',
+        Guava: 'امرود', Papaya: 'پپیتا', Lemon: 'لیموں', Coconut: 'ناریل',
+        Dates: 'کھجور', Pineapple: 'انناس', Sugarcane: 'گنا',
       },
       alphabet: {
         A: 'سیب', B: 'ریچھ', C: 'بلی', D: 'کتا', E: 'ہاتھی', F: 'مچھلی',
@@ -261,9 +264,10 @@ export const translations = {
         Y: 'یو یو', Z: 'زیبرا',
       },
       vegetables: {
-        Carrot: 'گاجر', Tomato: 'ٹماٹر', Corn: 'مکئی', Broccoli: 'بروکلی',
-        Potato: 'آلو', Onion: 'پیاز', Garlic: 'لہسن', Pepper: 'مرچ',
-        Cucumber: 'کھیرا', Eggplant: 'بینگن', Mushroom: 'کھمبی', Lettuce: 'سلاد پتہ',
+        Potato: 'آلو', Tomato: 'ٹماٹر', Onion: 'پیاز', Carrot: 'گاجر',
+        Pepper: 'مرچ', Eggplant: 'بینگن', Garlic: 'لہسن', Cucumber: 'کھیرا',
+        Corn: 'مکئی', Spinach: 'پالک', Peas: 'مٹر', Radish: 'مولی',
+        Pumpkin: 'کدو', Cauliflower: 'گوبھی',
       },
       kitchen: {
         Spoon: 'چمچ', Fork: 'کانٹا', Knife: 'چھری', Plate: 'پلیٹ', Cup: 'کپ',
@@ -393,9 +397,10 @@ export const translations = {
         Frog: 'मेंढक', Bird: 'चिड़िया', Fish: 'मछली', Monkey: 'बंदर', Bear: 'भालू', Rabbit: 'खरगोश',
       },
       fruits: {
-        Apple: 'सेब', Banana: 'केला', Orange: 'संतरा', Grapes: 'अंगूर',
-        Strawberry: 'स्ट्रॉबेरी', Watermelon: 'तरबूज़', Mango: 'आम', Pineapple: 'अनानास',
-        Cherry: 'चेरी', Peach: 'आड़ू', Pear: 'नाशपाती', Lemon: 'नींबू', Coconut: 'नारियल', Kiwi: 'कीवी',
+        Apple: 'सेब', Banana: 'केला', Orange: 'संतरा', Mango: 'आम',
+        Watermelon: 'तरबूज़', Grapes: 'अंगूर', Pomegranate: 'अनार',
+        Guava: 'अमरूद', Papaya: 'पपीता', Lemon: 'नींबू', Coconut: 'नारियल',
+        Dates: 'खजूर', Pineapple: 'अनानास', Sugarcane: 'गन्ना',
       },
       alphabet: {
         A: 'सेब', B: 'भालू', C: 'बिल्ली', D: 'कुत्ता', E: 'हाथी', F: 'मछली',
@@ -405,9 +410,10 @@ export const translations = {
         Y: 'यो-यो', Z: 'ज़ेबरा',
       },
       vegetables: {
-        Carrot: 'गाजर', Tomato: 'टमाटर', Corn: 'मक्का', Broccoli: 'ब्रोकली',
-        Potato: 'आलू', Onion: 'प्याज़', Garlic: 'लहसुन', Pepper: 'मिर्च',
-        Cucumber: 'खीरा', Eggplant: 'बैंगन', Mushroom: 'मशरूम', Lettuce: 'सलाद पत्ता',
+        Potato: 'आलू', Tomato: 'टमाटर', Onion: 'प्याज़', Carrot: 'गाजर',
+        Pepper: 'मिर्च', Eggplant: 'बैंगन', Garlic: 'लहसुन', Cucumber: 'खीरा',
+        Corn: 'मक्का', Spinach: 'पालक', Peas: 'मटर', Radish: 'मूली',
+        Pumpkin: 'कद्दू', Cauliflower: 'गोभी',
       },
       kitchen: {
         Spoon: 'चम्मच', Fork: 'काँटा', Knife: 'चाकू', Plate: 'प्लेट', Cup: 'कप',
