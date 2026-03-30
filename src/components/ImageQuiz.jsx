@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useLanguage } from '../LanguageContext'
 import { playCorrectSound, playWrongSound, playLevelUpSound, speakPrompt, speakName } from '../sounds'
-import { playAnimalSound } from '../animalSounds'
+import { playAnimalSound, preloadAnimalSounds } from '../animalSounds'
 import { CATEGORIES } from '../data/categories'
 
 const ROUNDS_PER_LEVEL = 10
@@ -468,6 +468,11 @@ export default function ImageQuiz({ categoryKey, onBack }) {
     { key: 'medium', emoji: '🧩', desc: t.mediumQuizDesc || 'More options to choose from!' },
     { key: 'hard', emoji: '⚡', desc: t.hardQuizDesc || 'Speed challenge with timer!' },
   ]
+
+  // Preload animal sounds when entering the animals category
+  useEffect(() => {
+    if (categoryKey === 'animals') preloadAnimalSounds()
+  }, [categoryKey])
 
   if (diffLevel === null) {
     return (

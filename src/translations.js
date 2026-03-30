@@ -155,7 +155,7 @@ export const translations = {
     hard: 'مشکل',
     pickGame: '!ایک گیم چنیں اور سیکھنا شروع کریں',
     madeWith: 'چھوٹے سیکھنے والوں کے لیے ❤️ سے بنایا گیا',
-    choosePrompt: (name) => `!${name} چنیں`,
+    choosePrompt: (name) => `${name} کا انتخاب کریں!`,
     easyColorDesc: '!آواز آپ کی رہنمائی کرے گی! رنگ سنیں، پھر تھپتھپائیں',
     easyShapeDesc: '!آواز آپ کی رہنمائی کرے گی! شکل سنیں، پھر تھپتھپائیں',
     colorDesc: '!صحیح رنگ کا نام تھپتھپائیں',

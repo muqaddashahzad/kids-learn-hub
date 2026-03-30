@@ -88,27 +88,22 @@ if (window.speechSynthesis) {
 // Speak a word using browser speech synthesis
 function speak(text, lang = 'en', rate = 0.85) {
   try {
-    // Cancel any ongoing speech first
     window.speechSynthesis.cancel()
-    
-    // Small delay to let cancel finish
     setTimeout(() => {
       const utterance = new SpeechSynthesisUtterance(text)
       const voiceLang = LANG_VOICE[lang] || 'en-US'
+      utterance.lang = voiceLang
       
-      // Always set a voice - getBestVoice now has English fallback
       const voice = getBestVoice(voiceLang)
       if (voice) {
-        utterance.voice = voice
-        utterance.lang = voice.lang // use the actual voice's language
-      } else {
-        utterance.lang = voiceLang
+        const voiceBase = voice.lang.split('-')[0]
+        const requestedBase = voiceLang.split('-')[0]
+        if (voiceBase === requestedBase) utterance.voice = voice
       }
       
       utterance.rate = rate
       utterance.pitch = 1.15
       utterance.volume = 0.85
-      
       window.speechSynthesis.speak(utterance)
     }, 50)
   } catch(e) { console.log('Speech error:', e) }
@@ -121,35 +116,32 @@ export function speakPrompt(name, lang = 'en') {
     try {
       window.speechSynthesis.cancel()
       const voiceLang = LANG_VOICE[lang] || 'en-US'
-      const voice = getBestVoice(voiceLang)
       
-      // Check if we have a native voice for this language
-      const voiceLangBase = voice ? voice.lang.split('-')[0] : 'en'
-      const requestedBase = voiceLang.split('-')[0]
-      const hasNativeVoice = voiceLangBase === requestedBase
-      
-      // If no native Urdu/Hindi voice, speak the English name instead of silent Urdu text
-      let text
-      if (hasNativeVoice) {
-        const phrases = {
-          en: `Choose ${name}`,
-          ur: `${name} چنیں`,
-          hi: `${name} चुनो`,
-        }
-        text = phrases[lang] || phrases.en
-      } else {
-        // Fallback: speak just the name in whatever voice we have
-        text = `Choose ${name}`
+      // Build the phrase in the correct language
+      const phrases = {
+        en: `Choose ${name}`,
+        ur: `${name} کا انتخاب کریں`,
+        hi: `${name} चुनो`,
       }
+      const text = phrases[lang] || phrases.en
       
       setTimeout(() => {
         const utterance = new SpeechSynthesisUtterance(text)
+        // Always set the requested language — browser will use its best available voice
+        // Don't force a mismatched voice (causes "Choose bandar" instead of proper Urdu)
+        utterance.lang = voiceLang
+        
+        // Only set voice if it matches the requested language
+        const voice = getBestVoice(voiceLang)
         if (voice) {
-          utterance.voice = voice
-          utterance.lang = voice.lang
-        } else {
-          utterance.lang = voiceLang
+          const voiceBase = voice.lang.split('-')[0]
+          const requestedBase = voiceLang.split('-')[0]
+          if (voiceBase === requestedBase) {
+            utterance.voice = voice
+          }
+          // If voice doesn't match language, let browser pick automatically
         }
+        
         utterance.rate = 0.8
         utterance.pitch = 1.2
         utterance.volume = 0.9
@@ -169,13 +161,15 @@ export function speakName(name, lang = 'en') {
     setTimeout(() => {
       const utterance = new SpeechSynthesisUtterance(name)
       const voiceLang = LANG_VOICE[lang] || 'en-US'
+      utterance.lang = voiceLang
+      
       const voice = getBestVoice(voiceLang)
       if (voice) {
-        utterance.voice = voice
-        utterance.lang = voice.lang
-      } else {
-        utterance.lang = voiceLang
+        const voiceBase = voice.lang.split('-')[0]
+        const requestedBase = voiceLang.split('-')[0]
+        if (voiceBase === requestedBase) utterance.voice = voice
       }
+      
       utterance.rate = 0.8
       utterance.pitch = 1.2
       utterance.volume = 0.9
