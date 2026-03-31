@@ -128,13 +128,13 @@ function EasyMode({ categoryKey, onBack, t, lang }) {
       <div className="display-area">
         {current && (
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '5rem', lineHeight: 1.2 }}>{current.emoji}</div>
+            <div style={{ fontSize: '5rem', lineHeight: 1.2, cursor: isAnimal ? 'pointer' : 'default' }} onClick={() => isAnimal && playAnimalSound(current.name)}>{current.emoji}</div>
             {isAlphabet && <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#FF6B6B', marginTop: '8px' }}>{current.name}</div>}
             <div style={{ fontSize: '1.2rem', fontWeight: '700', color: '#333', marginTop: '8px' }}>
               {isAlphabet ? getAlphabetLabel(t, current) : currentName}
             </div>
             {isAnimal && (
-              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px', cursor: 'pointer' }} onClick={() => playAnimalSound(current.name)}>
                 🔊 {t.tapToHearSound || 'Tap to hear the sound!'}
               </div>
             )}
@@ -239,13 +239,13 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
       <div className="display-area">
         {current && (
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '5rem', lineHeight: 1.2 }}>{current.emoji}</div>
+            <div style={{ fontSize: '5rem', lineHeight: 1.2, cursor: isAnimal ? 'pointer' : 'default' }} onClick={() => isAnimal && playAnimalSound(current.name)}>{current.emoji}</div>
             {isAlphabet && <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#FF6B6B', marginTop: '8px' }}>{current.name}</div>}
             <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#333', marginTop: '8px' }}>
               {isAlphabet ? getAlphabetLabel(t, current) : currentName}
             </div>
             {isAnimal && (
-              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px', cursor: 'pointer' }} onClick={() => playAnimalSound(current.name)}>
                 🔊 {t.tapToHearSound || 'Tap to hear the sound!'}
               </div>
             )}
@@ -381,13 +381,13 @@ function HardMode({ categoryKey, onBack, t, lang }) {
       <div className="display-area">
         {current && (
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '5rem', lineHeight: 1.2 }}>{current.emoji}</div>
+            <div style={{ fontSize: '5rem', lineHeight: 1.2, cursor: isAnimal ? 'pointer' : 'default' }} onClick={() => isAnimal && playAnimalSound(current.name)}>{current.emoji}</div>
             {isAlphabet && <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#FF6B6B', marginTop: '8px' }}>{current.name}</div>}
             <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#333', marginTop: '8px' }}>
               {isAlphabet ? getAlphabetLabel(t, current) : currentName}
             </div>
             {isAnimal && (
-              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '4px', cursor: 'pointer' }} onClick={() => playAnimalSound(current.name)}>
                 🔊 {t.tapToHearSound || 'Tap to hear the sound!'}
               </div>
             )}
