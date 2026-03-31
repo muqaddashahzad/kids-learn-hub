@@ -120,8 +120,8 @@ export const translations = {
       vegetables: {
         Potato: 'Potato', Tomato: 'Tomato', Onion: 'Onion', Carrot: 'Carrot',
         Pepper: 'Pepper', Eggplant: 'Eggplant', Garlic: 'Garlic', Cucumber: 'Cucumber',
-        Corn: 'Corn', Spinach: 'Spinach', Peas: 'Peas', Radish: 'Radish',
-        Pumpkin: 'Pumpkin', Cauliflower: 'Cauliflower',
+        Corn: 'Corn', Spinach: 'Spinach', Peas: 'Peas', Ginger: 'Ginger',
+        Pumpkin: 'Pumpkin', Broccoli: 'Broccoli',
       },
       kitchen: {
         Spoon: 'Spoon', Fork: 'Fork', Knife: 'Knife', Plate: 'Plate', Cup: 'Cup',
@@ -266,8 +266,8 @@ export const translations = {
       vegetables: {
         Potato: 'آلو', Tomato: 'ٹماٹر', Onion: 'پیاز', Carrot: 'گاجر',
         Pepper: 'مرچ', Eggplant: 'بینگن', Garlic: 'لہسن', Cucumber: 'کھیرا',
-        Corn: 'مکئی', Spinach: 'پالک', Peas: 'مٹر', Radish: 'مولی',
-        Pumpkin: 'کدو', Cauliflower: 'گوبھی',
+        Corn: 'مکئی', Spinach: 'پالک', Peas: 'مٹر', Ginger: 'ادرک',
+        Pumpkin: 'کدو', Broccoli: 'بروکلی',
       },
       kitchen: {
         Spoon: 'چمچ', Fork: 'کانٹا', Knife: 'چھری', Plate: 'پلیٹ', Cup: 'کپ',
@@ -412,8 +412,8 @@ export const translations = {
       vegetables: {
         Potato: 'आलू', Tomato: 'टमाटर', Onion: 'प्याज़', Carrot: 'गाजर',
         Pepper: 'मिर्च', Eggplant: 'बैंगन', Garlic: 'लहसुन', Cucumber: 'खीरा',
-        Corn: 'मक्का', Spinach: 'पालक', Peas: 'मटर', Radish: 'मूली',
-        Pumpkin: 'कद्दू', Cauliflower: 'गोभी',
+        Corn: 'मक्का', Spinach: 'पालक', Peas: 'मटर', Ginger: 'अदरक',
+        Pumpkin: 'कद्दू', Broccoli: 'ब्रोकली',
       },
       kitchen: {
         Spoon: 'चम्मच', Fork: 'काँटा', Knife: 'चाकू', Plate: 'प्लेट', Cup: 'कप',

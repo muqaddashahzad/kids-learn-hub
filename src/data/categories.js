@@ -101,9 +101,9 @@ export const CATEGORIES = {
       { name: 'Corn', emoji: '🌽' },
       { name: 'Spinach', emoji: '🥬' },
       { name: 'Peas', emoji: '🫛' },
-      { name: 'Radish', emoji: '🫚' },
+      { name: 'Ginger', emoji: '🫚' },
       { name: 'Pumpkin', emoji: '🎃' },
-      { name: 'Cauliflower', emoji: '🥦' },
+      { name: 'Broccoli', emoji: '🥦' },
     ]
   },
   kitchen: {
