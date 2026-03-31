@@ -117,13 +117,8 @@ export function speakPrompt(name, lang = 'en') {
       window.speechSynthesis.cancel()
       const voiceLang = LANG_VOICE[lang] || 'en-US'
       
-      // Build the phrase in the correct language
-      const phrases = {
-        en: `Choose ${name}`,
-        ur: `${name} کا انتخاب کریں`,
-        hi: `${name} चुनो`,
-      }
-      const text = phrases[lang] || phrases.en
+      // Just say the name clearly - no "Choose" prefix
+      const text = name
       
       setTimeout(() => {
         const utterance = new SpeechSynthesisUtterance(text)
@@ -240,26 +235,16 @@ export function playPopSound() {
   } catch(e) {}
 }
 
-// CORRECT: Happy tone + voice says "[answer]! Yes!"
+// CORRECT: Happy tone + voice says just the name
 export function playCorrectSound(answerName, lang = 'en') {
   playHappyTone()
-  const phrases = {
-    en: `${answerName}! Yes!`,
-    ur: `${answerName}! ہاں!`,
-    hi: `${answerName}! हाँ!`,
-  }
-  setTimeout(() => speak(phrases[lang] || phrases.en, lang), 400)
+  setTimeout(() => speak(answerName, lang), 400)
 }
 
-// WRONG: Sad tone + voice says "No, the answer is [correct answer]"
+// WRONG: Sad tone + voice says just the correct name
 export function playWrongSound(correctName, lang = 'en') {
   playSadTone()
-  const phrases = {
-    en: `No, the answer is ${correctName}`,
-    ur: `نہیں، جواب ${correctName} ہے`,
-    hi: `नहीं, जवाब ${correctName} है`,
-  }
-  setTimeout(() => speak(phrases[lang] || phrases.en, lang), 450)
+  setTimeout(() => speak(correctName, lang), 450)
 }
 
 // Level up celebration fanfare + voice
