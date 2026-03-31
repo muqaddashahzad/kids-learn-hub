@@ -537,9 +537,9 @@ export default function LearnShapes({ onBack }) {
   const [diffLevel, setDiffLevel] = useState(null)
 
   const DIFFICULTIES = [
-    { key: 'easy', label: '🟢', emoji: '🔊', desc: t.easyShapeDesc || 'Voice guides you! Hear the shape, then tap it.' },
-    { key: 'medium', label: '🟡', emoji: '🎈', desc: t.popShapesDesc || 'Pop the right falling shapes!' },
-    { key: 'hard', label: '🔴', emoji: '⚡', desc: t.shapeChallengeDesc || 'Speed shape challenge with timer!' },
+    { key: 'easy', label: '🔊 Learn Shapes', emoji: '🔊', desc: t.easyShapeDesc || 'Voice guides you! Hear the shape, then tap it.' },
+    { key: 'medium', label: '🎈 Pop Shapes', emoji: '🎈', desc: t.popShapesDesc || 'Pop the right falling shapes!' },
+    { key: 'hard', label: '⚡ Speed Challenge', emoji: '⚡', desc: t.shapeChallengeDesc || 'Speed shape challenge with timer!' },
   ]
 
   if (diffLevel === null) {

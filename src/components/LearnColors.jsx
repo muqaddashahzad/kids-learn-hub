@@ -377,159 +377,6 @@ function MediumMode({ onBack, t, lang }) {
   )
 }
 
-// ============ HARD MODE: Color Memory Match ============
-function HardMode({ onBack, t, lang }) {
-  const [phase, setPhase] = useState('playing')
-  const [cards, setCards] = useState([])
-  const [flipped, setFlipped] = useState([])
-  const [matched, setMatched] = useState([])
-  const [moves, setMoves] = useState(0)
-  const [timer, setTimer] = useState(0)
-  const timerRef = useRef(null)
-  // Use ref to track flipped cards to avoid React state batching issues
-  const flippedRef = useRef([])
-  const lockRef = useRef(false)
-
-  const initGame = useCallback(() => {
-    const picked = shuffle([...COLORS]).slice(0, 6)
-    const pairs = [...picked, ...picked].map((c, i) => ({ ...c, uid: i }))
-    setCards(shuffle(pairs))
-    setFlipped([]); setMatched([]); setMoves(0); setTimer(0)
-    flippedRef.current = []
-    lockRef.current = false; setPhase('playing')
-  }, [])
-
-  useEffect(() => { initGame() }, [initGame])
-
-  // Timer
-  useEffect(() => {
-    if (phase !== 'playing' || matched.length === cards.length) return
-    timerRef.current = setInterval(() => setTimer(t => t + 1), 1000)
-    return () => clearInterval(timerRef.current)
-  }, [phase, matched.length, cards.length])
-
-  const handleFlip = (index) => {
-    // Block if locked (checking a pair) or already flipped/matched
-    if (lockRef.current) return
-    if (flippedRef.current.includes(index)) return
-    if (matched.includes(index)) return
-
-    // Add to flipped using ref (avoids stale state)
-    flippedRef.current = [...flippedRef.current, index]
-    setFlipped([...flippedRef.current])
-
-    // Speak the color name when card is flipped (helps kids learn)
-    speakName(t.colors[cards[index].name], lang)
-
-    if (flippedRef.current.length === 2) {
-      // Two cards flipped - lock immediately
-      lockRef.current = true
-      setMoves(m => m + 1)
-      const [a, b] = flippedRef.current
-
-      if (cards[a].name === cards[b].name) {
-        // Match found!
-        playCorrectSound(t.colors[cards[a].name], lang)
-        setTimeout(() => {
-          const newMatched = [...matched, a, b]
-          setMatched(newMatched)
-          flippedRef.current = []
-          setFlipped([])
-          lockRef.current = false
-          // Check win - all 12 cards matched
-          if (newMatched.length === cards.length) {
-            setPhase('done')
-            clearInterval(timerRef.current)
-            playLevelUpSound(lang)
-          }
-        }, 600)
-      } else {
-        // No match - show briefly then flip back
-        playWrongSound(t.colors[cards[a].name], lang)
-        setTimeout(() => {
-          flippedRef.current = []
-          setFlipped([])
-          lockRef.current = false
-        }, 900)
-      }
-    }
-  }
-
-  if (phase === 'done' || (matched.length === cards.length && cards.length > 0)) {
-    const emoji = moves <= 10 ? '🏆' : moves <= 15 ? '⭐' : '💪'
-    const stars = moves <= 10 ? 3 : moves <= 15 ? 2 : 1
-    return (
-      <div className="result-screen">
-        <div className="result-emoji">{emoji}</div>
-        <div style={{ fontSize: '2rem', fontWeight: '700', color: '#333' }}>
-          {'⭐'.repeat(stars)}
-        </div>
-        <div style={{ fontSize: '0.95rem', color: '#666', margin: '8px 0' }}>
-          {t.memoryMoves ? t.memoryMoves(moves) : `${moves} moves`} • {timer}s
-        </div>
-        <div className="result-message">
-          {stars === 3 ? (t.memoryPerfect || 'Perfect memory!') :
-           stars === 2 ? (t.memoryGreat || 'Great job!') :
-           (t.memoryGood || 'Good try!')}
-        </div>
-        <button className="play-again-btn" onClick={initGame}>{t.playAgain}</button>
-        <br /><br />
-        <button className="play-again-btn" style={{ background: '#aaa' }} onClick={onBack}>{t.home}</button>
-      </div>
-    )
-  }
-
-  return (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 12px', fontSize: '0.9rem', color: '#555' }}>
-        <span>🧠 {t.memoryMatch || 'Memory Match'}</span>
-        <span>🔄 {moves}</span>
-        <span>⏱️ {timer}s</span>
-      </div>
-      {/* How to play hint */}
-      {moves === 0 && (
-        <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#888', padding: '4px', background: '#f5f5f5', borderRadius: '8px', margin: '4px 12px' }}>
-          💡 {t.memoryHint || 'Tap 2 cards to flip them. Find all matching color pairs!'}
-        </div>
-      )}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px',
-        padding: '8px', maxWidth: '360px', margin: '0 auto',
-      }}>
-        {cards.map((card, i) => {
-          const isFlipped = flipped.includes(i) || matched.includes(i)
-          const isMatched = matched.includes(i)
-          return (
-            <div key={i} onClick={() => handleFlip(i)} style={{
-              aspectRatio: '1', borderRadius: '14px', cursor: 'pointer',
-              background: isFlipped ? card.hex : 'linear-gradient(135deg, #667eea, #764ba2)',
-              border: isMatched ? '3px solid #4CAF50' : isFlipped ? '3px solid #fff' : '3px solid transparent',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.3s',
-              boxShadow: isMatched ? '0 0 15px rgba(76,175,80,0.4)' : '0 3px 10px rgba(0,0,0,0.15)',
-              position: 'relative', overflow: 'hidden',
-              opacity: isMatched ? 0.7 : 1,
-            }}>
-              {isFlipped ? (
-                <span style={{
-                  fontSize: '0.75rem', fontWeight: '700',
-                  color: COLOR_TEXT[card.name] || '#fff',
-                  textShadow: (COLOR_TEXT[card.name] || '#fff') === '#fff' ? '1px 1px 2px rgba(0,0,0,0.4)' : 'none',
-                  textAlign: 'center', padding: '4px',
-                }}>{t.colors[card.name]}</span>
-              ) : (
-                <span style={{ fontSize: '1.5rem' }}>❓</span>
-              )}
-              {isMatched && <div style={{
-                position: 'absolute', top: '4px', right: '4px', fontSize: '0.8rem'
-              }}>✅</div>}
-            </div>
-          )
-        })}
-      </div>
-    </>
-  )
-}
 
 // ============ COLOR SPLASH MODE ============
 const SPLASH_COLORS = [
@@ -782,6 +629,32 @@ const MIXES = [
   { c1: 'black', c2: 'white', result: 'gray', distractors: ['purple', 'pink', 'green'] },
 ]
 
+const REVERSE_MIXES = {
+  purple: ['red', 'blue'],
+  orange: ['red', 'yellow'],
+  green: ['blue', 'yellow'],
+  pink: ['red', 'white'],
+  gray: ['black', 'white'],
+}
+
+const cmSplitStyles = `
+@keyframes cmSplit {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--split-x), -20px) scale(0.7); opacity: 0.8; }
+}
+@keyframes cmShake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+@keyframes cmFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+`
+
 const MIX_TOTAL_ROUNDS = 8
 
 function ColorMixingMode({ onBack, t, lang }) {
@@ -793,19 +666,23 @@ function ColorMixingMode({ onBack, t, lang }) {
   const [selected, setSelected] = useState(null)
   const [mixing, setMixing] = useState(false)
   const [gameOver, setGameOver] = useState(false)
+  const [splitAnim, setSplitAnim] = useState(null) // { color, parts: [c1, c2] }
+  const [bonusColors, setBonusColors] = useState([])
   const mounted = useRef(true)
 
   useEffect(() => { mounted.current = true; return () => { mounted.current = false } }, [])
 
-  const generateMixRound = useCallback(() => {
+  const generateMixRound = useCallback((bonus) => {
     const m = MIXES[Math.floor(Math.random() * MIXES.length)]
-    const opts = shuffle([m.result, ...shuffle(m.distractors).slice(0, 2)])
-    setMix(m); setOptions(opts); setFeedback(null); setSelected(null); setMixing(true)
+    const pool = [...m.distractors, ...(bonus || [])]
+    const uniquePool = [...new Set(pool)].filter(c => c !== m.result)
+    const opts = shuffle([m.result, ...shuffle(uniquePool).slice(0, 2)])
+    setMix(m); setOptions(opts); setFeedback(null); setSelected(null); setSplitAnim(null); setMixing(true)
     setTimeout(() => { if (mounted.current) setMixing(false) }, 1500)
     speakPrompt(`${m.c1} plus ${m.c2} makes what color?`, lang).catch(() => {})
   }, [lang])
 
-  useEffect(() => { if (!gameOver) generateMixRound() }, [round, gameOver, generateMixRound])
+  useEffect(() => { if (!gameOver) generateMixRound(bonusColors) }, [round, gameOver]) // eslint-disable-line
 
   const handlePick = useCallback((color) => {
     if (feedback !== null || mixing) return
@@ -819,15 +696,33 @@ function ColorMixingMode({ onBack, t, lang }) {
       }, 1800)
     } else {
       setFeedback('wrong'); playWrongSound(color, lang)
-      setTimeout(() => {
-        if (!mounted.current) return
-        if (round + 1 >= MIX_TOTAL_ROUNDS) setGameOver(true)
-        else setRound(r => r + 1)
-      }, 2000)
+      // Check if the wrong color can split
+      const parts = REVERSE_MIXES[color]
+      if (parts) {
+        setSplitAnim({ color, parts })
+        // Add ingredient colors to bonus pool for future rounds
+        setBonusColors(prev => {
+          const next = [...prev]
+          parts.forEach(p => { if (!next.includes(p)) next.push(p) })
+          return next
+        })
+        setTimeout(() => {
+          if (!mounted.current) return
+          if (round + 1 >= MIX_TOTAL_ROUNDS) setGameOver(true)
+          else setRound(r => r + 1)
+        }, 2500)
+      } else {
+        // Base color - just shake
+        setTimeout(() => {
+          if (!mounted.current) return
+          if (round + 1 >= MIX_TOTAL_ROUNDS) setGameOver(true)
+          else setRound(r => r + 1)
+        }, 1500)
+      }
     }
   }, [feedback, mixing, mix, lang, round])
 
-  const restart = () => { setRound(0); setScore(0); setGameOver(false) }
+  const restart = () => { setRound(0); setScore(0); setGameOver(false); setBonusColors([]) }
 
   if (gameOver) {
     const emoji = score >= 7 ? '🎨' : score >= 4 ? '🌈' : '💪'
@@ -848,6 +743,7 @@ function ColorMixingMode({ onBack, t, lang }) {
 
   return (
     <>
+      <style>{cmSplitStyles}</style>
       <div style={{ textAlign: 'center', fontSize: '18px', color: '#777', margin: '8px 0' }}>
         {t.roundXofY ? t.roundXofY(round + 1, MIX_TOTAL_ROUNDS) : `Round ${round + 1} of ${MIX_TOTAL_ROUNDS}`}
       </div>
@@ -897,14 +793,19 @@ function ColorMixingMode({ onBack, t, lang }) {
         {options.map((color, idx) => {
           let border = '3px solid #ddd'
           let transform = 'scale(1)'
+          let anim = 'none'
           if (selected === color && feedback === 'correct') { border = '4px solid #4CAF50'; transform = 'scale(1.1)' }
-          if (selected === color && feedback === 'wrong') { border = '4px solid #f44336' }
+          if (selected === color && feedback === 'wrong') {
+            border = '4px solid #f44336'
+            if (!REVERSE_MIXES[color]) anim = 'cmShake 0.5s ease'
+          }
           if (feedback === 'wrong' && color === mix.result) { border = '4px solid #4CAF50' }
           return (
             <button key={idx} onClick={() => handlePick(color)} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
               padding: '14px 20px', borderRadius: '20px', background: '#fff',
               border, cursor: 'pointer', transition: 'transform 0.2s', transform, minWidth: '90px',
+              animation: anim,
             }}>
               <div style={{
                 width: '50px', height: '50px', borderRadius: '50%', background: MIX_COLOR_MAP[color],
@@ -916,14 +817,57 @@ function ColorMixingMode({ onBack, t, lang }) {
         })}
       </div>
 
-      {feedback && (
+      {/* Split animation for wrong answers on compound colors */}
+      {splitAnim && (
+        <div style={{ textAlign: 'center', margin: '16px', animation: 'cmFadeIn 0.3s ease' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '8px', position: 'relative', height: '70px' }}>
+            {/* Original wrong color circle (fades out) */}
+            <div style={{
+              width: '60px', height: '60px', borderRadius: '50%', background: MIX_COLOR_MAP[splitAnim.color],
+              position: 'absolute', left: '50%', top: '50%', marginLeft: '-30px', marginTop: '-30px',
+              opacity: 0, transition: 'opacity 0.5s',
+            }} />
+            {/* Left split piece */}
+            <div style={{
+              width: '45px', height: '45px', borderRadius: '50%', background: MIX_COLOR_MAP[splitAnim.parts[0]],
+              boxShadow: '0 3px 10px rgba(0,0,0,0.2)', border: splitAnim.parts[0] === 'white' ? '2px solid #ccc' : 'none',
+              '--split-x': '-30px',
+              animation: 'cmSplit 0.8s ease-out forwards reverse',
+            }} />
+            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#999' }}>+</div>
+            {/* Right split piece */}
+            <div style={{
+              width: '45px', height: '45px', borderRadius: '50%', background: MIX_COLOR_MAP[splitAnim.parts[1]],
+              boxShadow: '0 3px 10px rgba(0,0,0,0.2)', border: splitAnim.parts[1] === 'white' ? '2px solid #ccc' : 'none',
+              '--split-x': '30px',
+              animation: 'cmSplit 0.8s ease-out forwards reverse',
+            }} />
+          </div>
+          <div style={{
+            fontSize: '16px', fontWeight: '700', color: '#c62828', padding: '8px 16px',
+            background: '#fce4ec', borderRadius: '12px', display: 'inline-block',
+          }}>
+            💡 <span style={{ textTransform: 'capitalize' }}>{splitAnim.color}</span> splits into{' '}
+            <span style={{ color: MIX_COLOR_MAP[splitAnim.parts[0]], textTransform: 'capitalize' }}>{splitAnim.parts[0]}</span>
+            {' + '}
+            <span style={{ color: MIX_COLOR_MAP[splitAnim.parts[1]], textTransform: 'capitalize' }}>{splitAnim.parts[1]}</span>!
+          </div>
+          <div style={{ fontSize: '13px', color: '#888', marginTop: '4px' }}>
+            The answer was <span style={{ fontWeight: '700', textTransform: 'capitalize', color: MIX_COLOR_MAP[mix.result] }}>{mix.result}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback for correct or wrong without split */}
+      {feedback && !splitAnim && (
         <div style={{
           textAlign: 'center', fontSize: '22px', margin: '16px', padding: '12px',
           borderRadius: '16px', fontWeight: 'bold',
           background: feedback === 'correct' ? '#e8f5e9' : '#fce4ec',
           color: feedback === 'correct' ? '#2e7d32' : '#c62828',
         }}>
-          {feedback === 'correct' ? `✅ ${mix.c1} + ${mix.c2} = ${mix.result}!` : `❌ It makes ${mix.result}!`}
+          {feedback === 'correct' ? `✅ ${mix.c1} + ${mix.c2} = ${mix.result}!` :
+           `❌ Try again! It makes ${mix.result}!`}
         </div>
       )}
     </>
@@ -938,7 +882,6 @@ export default function LearnColors({ onBack }) {
   const DIFFICULTIES = [
     { key: 'easy', label: '🔊 Learn Colors', emoji: '🔊', desc: t.easyColorDesc || 'Voice guides you! Hear the color, then tap it.' },
     { key: 'medium', label: '🎈 Balloon Pop', emoji: '🎈', desc: t.popColorsDesc || 'Pop the right color balloons!' },
-    { key: 'hard', label: '🧠 Memory Match', emoji: '🧠', desc: t.memoryMatchDesc || 'Find matching color pairs!' },
     { key: 'splash', label: '🎨 Color Splash', emoji: '🎨', desc: t.colorSplashDesc || 'Splash shapes with the right color!' },
     { key: 'mixing', label: '🌈 Color Mixing', emoji: '🌈', desc: t.colorMixingDesc || 'Mix two colors to make a new one!' },
   ]
@@ -961,7 +904,6 @@ export default function LearnColors({ onBack }) {
             const bgs = [
               'linear-gradient(135deg, #4CAF50, #66BB6A)',
               'linear-gradient(135deg, #FF9800, #FFB74D)',
-              'linear-gradient(135deg, #f44336, #EF5350)',
               'linear-gradient(135deg, #E91E63, #F06292)',
               'linear-gradient(135deg, #9C27B0, #BA68C8)',
             ]
@@ -998,9 +940,8 @@ export default function LearnColors({ onBack }) {
 
       {diffLevel === 0 && <EasyMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
       {diffLevel === 1 && <MediumMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
-      {diffLevel === 2 && <HardMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
-      {diffLevel === 3 && <ColorSplashMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
-      {diffLevel === 4 && <ColorMixingMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
+      {diffLevel === 2 && <ColorSplashMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
+      {diffLevel === 3 && <ColorMixingMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
     </div>
   )
 }
