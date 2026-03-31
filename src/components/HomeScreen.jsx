@@ -341,119 +341,39 @@ export default function HomeScreen({ onNavigate }) {
     if (saved) setScores(JSON.parse(saved))
   }, [])
 
-  const cards = [
-    // Existing games
-    {
-      id: 'colors', emoji: '🎨', title: t.learnColors, age: t.ages24,
-      desc: t.colorDesc, cls: 'colors'
-    },
-    {
-      id: 'shapes', emoji: '⭐', title: t.learnShapes, age: t.ages24,
-      desc: t.shapeDesc, cls: 'shapes'
-    },
-    // NEW categories
-    {
-      id: 'animals', emoji: '🐾', age: t.ages24, cls: 'animals',
-      title: t.categoryTitles?.animals || 'Animals',
-      desc: t.categoryDescs?.animals || 'Learn animal names and sounds!',
-    },
-    {
-      id: 'fruits', emoji: '🍎', age: t.ages24, cls: 'fruits',
-      title: t.categoryTitles?.fruits || 'Fruits',
-      desc: t.categoryDescs?.fruits || 'Learn fruit names!',
-    },
-    {
-      id: 'alphabet', emoji: '🔤', age: t.ages24, cls: 'alphabet',
-      title: t.categoryTitles?.alphabet || 'Alphabet',
-      desc: t.categoryDescs?.alphabet || 'A for Apple, B for Bear...',
-    },
-    {
-      id: 'vegetables', emoji: '🥕', age: t.ages24, cls: 'vegetables',
-      title: t.categoryTitles?.vegetables || 'Vegetables',
-      desc: t.categoryDescs?.vegetables || 'Learn vegetable names!',
-    },
-    {
-      id: 'kitchen', emoji: '🍳', age: t.ages24, cls: 'kitchen',
-      title: t.categoryTitles?.kitchen || 'Kitchen Items',
-      desc: t.categoryDescs?.kitchen || 'Learn kitchen item names!',
-    },
-    {
-      id: 'home-items', emoji: '🏠', age: t.ages24, cls: 'home',
-      title: t.categoryTitles?.home || 'Home Items',
-      desc: t.categoryDescs?.home || 'Learn things found at home!',
-    },
-    {
-      id: 'objects', emoji: '🎒', age: t.ages24, cls: 'objects',
-      title: t.categoryTitles?.objects || 'Everyday Objects',
-      desc: t.categoryDescs?.objects || 'Learn everyday object names!',
-    },
-    {
-      id: 'tools', emoji: '🔧', age: t.ages24, cls: 'tools',
-      title: t.categoryTitles?.tools || 'Tools',
-      desc: t.categoryDescs?.tools || 'Learn tool names!',
-    },
-    // Fun games
-    {
-      id: 'counting', emoji: '🔢', age: t.ages24, cls: 'counting',
-      title: t.countingTitle || 'Counting',
-      desc: t.countingDesc || 'Count objects and pick the number!',
-    },
-    {
-      id: 'music', emoji: '🎵', age: t.ages24, cls: 'music',
-      title: t.musicTitle || 'Music & Sounds',
-      desc: t.musicDesc || 'Play piano, xylophone & drums!',
-    },
-    {
-      id: 'tracing', emoji: '✍️', age: t.ages24, cls: 'tracing',
-      title: t.tracingTitle || 'Trace Letters',
-      desc: t.tracingDesc || 'Trace ABC with your finger!',
-    },
-    {
-      id: 'word-builder', emoji: '🔤', age: t.ages24, cls: 'wordbuilder',
-      title: t.wordBuilderTitle || 'Word Builder',
-      desc: t.wordBuilderDesc || 'Spell words by tapping letters!',
-    },
-    {
-      id: 'odd-one-out', emoji: '🎯', age: t.ages24, cls: 'oddoneout',
-      title: t.oddOneOutTitle || 'Odd One Out',
-      desc: t.oddOneOutDesc || 'Find which one doesn\'t belong!',
-    },
-    {
-      id: 'math', emoji: '🧮', age: t.ages24, cls: 'math',
-      title: t.mathTitle || 'Simple Math',
-      desc: t.mathDesc || 'Fun addition with pictures!',
-    },
-    {
-      id: 'color-mixing', emoji: '🌈', age: t.ages24, cls: 'colormixing',
-      title: t.colorMixingTitle || 'Color Mixing',
-      desc: t.colorMixingDesc || 'Mix colors to make new ones!',
-    },
-    {
-      id: 'match-pairs', emoji: '🃏', age: t.ages24, cls: 'matchpairs',
-      title: t.matchPairsTitle || 'Match Pairs',
-      desc: t.matchPairsDesc || 'Flip cards and find matching pairs!',
-    },
-    // New games
-    {
-      id: 'feed-monster', emoji: '👾', age: t.ages24, cls: 'feedmonster',
-      title: t.feedMonsterTitle || 'Feed the Monster',
-      desc: t.feedMonsterDesc || 'Feed the hungry monster the right food!',
-    },
-    {
-      id: 'match-shadow', emoji: '🌑', age: t.ages24, cls: 'matchshadow',
-      title: t.matchShadowTitle || 'Match Shadow',
-      desc: t.matchShadowDesc || 'Drag objects to their matching shadow!',
-    },
-    {
-      id: 'color-splash', emoji: '🎨', age: t.ages24, cls: 'colorsplash',
-      title: t.colorSplashTitle || 'Color Splash',
-      desc: t.colorSplashDesc || 'Splash objects with the right color!',
-    },
-    // Sudoku
-    {
-      id: 'sudoku', emoji: '🧩', title: t.sudoku, age: t.ages612,
-      desc: t.sudokuDesc, cls: 'sudoku'
-    },
+  const allCards = {
+    'colors': { id: 'colors', emoji: '🎨', title: t.learnColors, age: t.ages24, desc: t.colorDesc, cls: 'colors' },
+    'shapes': { id: 'shapes', emoji: '⭐', title: t.learnShapes, age: t.ages24, desc: t.shapeDesc, cls: 'shapes' },
+    'animals': { id: 'animals', emoji: '🐾', age: t.ages24, cls: 'animals', title: t.categoryTitles?.animals || 'Animals', desc: t.categoryDescs?.animals || 'Learn animal names and sounds!' },
+    'fruits': { id: 'fruits', emoji: '🍎', age: t.ages24, cls: 'fruits', title: t.categoryTitles?.fruits || 'Fruits', desc: t.categoryDescs?.fruits || 'Learn fruit names!' },
+    'alphabet': { id: 'alphabet', emoji: '🔤', age: t.ages24, cls: 'alphabet', title: t.categoryTitles?.alphabet || 'Alphabet', desc: t.categoryDescs?.alphabet || 'A for Apple, B for Bear...' },
+    'vegetables': { id: 'vegetables', emoji: '🥕', age: t.ages24, cls: 'vegetables', title: t.categoryTitles?.vegetables || 'Vegetables', desc: t.categoryDescs?.vegetables || 'Learn vegetable names!' },
+    'kitchen': { id: 'kitchen', emoji: '🍳', age: t.ages24, cls: 'kitchen', title: t.categoryTitles?.kitchen || 'Kitchen Items', desc: t.categoryDescs?.kitchen || 'Learn kitchen item names!' },
+    'home-items': { id: 'home-items', emoji: '🏠', age: t.ages24, cls: 'home', title: t.categoryTitles?.home || 'Home Items', desc: t.categoryDescs?.home || 'Learn things found at home!' },
+    'objects': { id: 'objects', emoji: '🎒', age: t.ages24, cls: 'objects', title: t.categoryTitles?.objects || 'Everyday Objects', desc: t.categoryDescs?.objects || 'Learn everyday object names!' },
+    'tools': { id: 'tools', emoji: '🔧', age: t.ages24, cls: 'tools', title: t.categoryTitles?.tools || 'Tools', desc: t.categoryDescs?.tools || 'Learn tool names!' },
+    'counting': { id: 'counting', emoji: '🔢', age: t.ages24, cls: 'counting', title: t.countingTitle || 'Counting', desc: t.countingDesc || 'Count objects and pick the number!' },
+    'music': { id: 'music', emoji: '🎵', age: t.ages24, cls: 'music', title: t.musicTitle || 'Music & Sounds', desc: t.musicDesc || 'Play piano, xylophone & drums!' },
+    'tracing': { id: 'tracing', emoji: '✍️', age: t.ages24, cls: 'tracing', title: t.tracingTitle || 'Trace Letters', desc: t.tracingDesc || 'Trace ABC with your finger!' },
+    'word-builder': { id: 'word-builder', emoji: '🔤', age: t.ages24, cls: 'wordbuilder', title: t.wordBuilderTitle || 'Word Builder', desc: t.wordBuilderDesc || 'Spell words by tapping letters!' },
+    'odd-one-out': { id: 'odd-one-out', emoji: '🎯', age: t.ages24, cls: 'oddoneout', title: t.oddOneOutTitle || 'Odd One Out', desc: t.oddOneOutDesc || 'Find which one doesn\'t belong!' },
+    'math': { id: 'math', emoji: '🧮', age: t.ages24, cls: 'math', title: t.mathTitle || 'Simple Math', desc: t.mathDesc || 'Fun addition with pictures!' },
+    'match-pairs': { id: 'match-pairs', emoji: '🃏', age: t.ages24, cls: 'matchpairs', title: t.matchPairsTitle || 'Match Pairs', desc: t.matchPairsDesc || 'Flip cards and find matching pairs!' },
+    'feed-monster': { id: 'feed-monster', emoji: '👾', age: t.ages24, cls: 'feedmonster', title: t.feedMonsterTitle || 'Feed the Monster', desc: t.feedMonsterDesc || 'Feed the hungry monster the right food!' },
+    'match-shadow': { id: 'match-shadow', emoji: '🌑', age: t.ages24, cls: 'matchshadow', title: t.matchShadowTitle || 'Match Shadow', desc: t.matchShadowDesc || 'Drag objects to their matching shadow!' },
+    'sudoku': { id: 'sudoku', emoji: '🧩', title: t.sudoku, age: t.ages612, desc: t.sudokuDesc, cls: 'sudoku' },
+  }
+
+  const groups = [
+    { title: 'Colors & Art', emoji: '🎨', cardIds: ['colors'] },
+    { title: 'Shapes', emoji: '⭐', cardIds: ['shapes'] },
+    { title: 'Animals', emoji: '🐾', cardIds: ['animals'] },
+    { title: 'Letters & Words', emoji: '🔤', cardIds: ['alphabet', 'tracing', 'word-builder'] },
+    { title: 'Numbers & Logic', emoji: '🔢', cardIds: ['counting', 'math', 'sudoku'] },
+    { title: 'Food & Nature', emoji: '🍎', cardIds: ['fruits', 'vegetables'] },
+    { title: 'Things Around Us', emoji: '🏠', cardIds: ['kitchen', 'home-items', 'objects', 'tools'] },
+    { title: 'Fun Games', emoji: '🎮', cardIds: ['odd-one-out', 'match-pairs', 'feed-monster', 'match-shadow'] },
+    { title: 'Music', emoji: '🎵', cardIds: ['music'] },
   ]
 
   return (
@@ -512,53 +432,76 @@ export default function HomeScreen({ onNavigate }) {
           {/* Subtitle */}
           <p className="hs-subtitle">{t.pickGame}</p>
 
-          {/* Cards Grid */}
-          <div className="hs-grid">
-            {cards.map((card, idx) => {
-              const style = CARD_STYLES[card.cls] || {}
-              const borderColor = style.border || '#ddd'
-              return (
-                <div
-                  key={card.id}
-                  className="hs-card"
-                  style={{
-                    background: style.bg || '#fff',
-                    borderLeft: `4px solid ${borderColor}`,
-                    animationDelay: `${idx * 0.06}s`,
-                  }}
-                  onClick={() => onNavigate(card.id)}
-                >
-                  {/* Glow effect on hover */}
-                  <div
-                    className="hs-card-glow"
-                    style={{
-                      boxShadow: `0 0 30px ${borderColor}, 0 0 60px ${borderColor}40`,
-                    }}
-                  />
-
-                  <div
-                    className="hs-card-emoji"
-                    style={{ animationDelay: `${(idx * 0.3) % 3}s` }}
-                  >
-                    {card.emoji}
-                  </div>
-                  <div className="hs-card-title">{card.title}</div>
-                  <div
-                    className="hs-card-age"
-                    style={{ background: borderColor }}
-                  >
-                    {card.age}
-                  </div>
-                  <div className="hs-card-desc">{card.desc}</div>
-                  {scores[card.id] !== undefined && (
-                    <div className="hs-card-score">
-                      Best: {scores[card.id]}/10 ⭐
-                    </div>
-                  )}
+          {/* Grouped Cards */}
+          {groups.map((group, gIdx) => {
+            let cardIndex = 0
+            for (let g = 0; g < gIdx; g++) cardIndex += groups[g].cardIds.length
+            return (
+              <div key={group.title} style={{ marginTop: gIdx === 0 ? 0 : '24px' }}>
+                {/* Section Header */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '8px 4px', marginBottom: '10px',
+                  borderBottom: '2px solid rgba(255,255,255,0.2)',
+                }}>
+                  <span style={{ fontSize: '1.5rem' }}>{group.emoji}</span>
+                  <span style={{
+                    color: 'white', fontSize: '1.15rem', fontWeight: '800',
+                    textShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  }}>{group.title}</span>
                 </div>
-              )
-            })}
-          </div>
+
+                {/* Cards Grid */}
+                <div className="hs-grid">
+                  {group.cardIds.map((cardId, idx) => {
+                    const card = allCards[cardId]
+                    if (!card) return null
+                    const style = CARD_STYLES[card.cls] || {}
+                    const borderColor = style.border || '#ddd'
+                    const globalIdx = cardIndex + idx
+                    return (
+                      <div
+                        key={card.id}
+                        className="hs-card"
+                        style={{
+                          background: style.bg || '#fff',
+                          borderLeft: `4px solid ${borderColor}`,
+                          animationDelay: `${globalIdx * 0.06}s`,
+                        }}
+                        onClick={() => onNavigate(card.id)}
+                      >
+                        <div
+                          className="hs-card-glow"
+                          style={{
+                            boxShadow: `0 0 30px ${borderColor}, 0 0 60px ${borderColor}40`,
+                          }}
+                        />
+                        <div
+                          className="hs-card-emoji"
+                          style={{ animationDelay: `${(globalIdx * 0.3) % 3}s` }}
+                        >
+                          {card.emoji}
+                        </div>
+                        <div className="hs-card-title">{card.title}</div>
+                        <div
+                          className="hs-card-age"
+                          style={{ background: borderColor }}
+                        >
+                          {card.age}
+                        </div>
+                        <div className="hs-card-desc">{card.desc}</div>
+                        {scores[card.id] !== undefined && (
+                          <div className="hs-card-score">
+                            Best: {scores[card.id]}/10 ⭐
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
 
           {/* Footer */}
           <div className="hs-footer">{t.madeWith}</div>

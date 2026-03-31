@@ -531,15 +531,416 @@ function HardMode({ onBack, t, lang }) {
   )
 }
 
+// ============ COLOR SPLASH MODE ============
+const SPLASH_COLORS = [
+  { name: 'red', hex: '#FF4444' },
+  { name: 'blue', hex: '#4488FF' },
+  { name: 'green', hex: '#44CC44' },
+  { name: 'yellow', hex: '#FFD700' },
+  { name: 'purple', hex: '#9944CC' },
+  { name: 'orange', hex: '#FF8800' },
+  { name: 'pink', hex: '#FF69B4' },
+]
+
+const SPLASH_SHAPES = [
+  { type: 'circle', label: 'Circle' },
+  { type: 'square', label: 'Square' },
+  { type: 'star', label: 'Star' },
+  { type: 'diamond', label: 'Diamond' },
+  { type: 'heart', label: 'Heart' },
+  { type: 'triangle', label: 'Triangle' },
+]
+
+const SPLASH_TOTAL_ROUNDS = 10
+
+function generateSplashRound() {
+  const target = SPLASH_COLORS[Math.floor(Math.random() * SPLASH_COLORS.length)]
+  const shape = SPLASH_SHAPES[Math.floor(Math.random() * SPLASH_SHAPES.length)]
+  const others = SPLASH_COLORS.filter(c => c.name !== target.name)
+  const shuffledOthers = shuffle(others).slice(0, 3)
+  const options = shuffle([target, ...shuffledOthers])
+  return { target, shape, options }
+}
+
+function SplashShapeRenderer({ type, size, color, style: extraStyle }) {
+  const base = {
+    width: size, height: size,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    transition: 'background 0.4s ease, border-color 0.4s ease',
+    ...extraStyle,
+  }
+  if (type === 'circle') return <div style={{ ...base, borderRadius: '50%', background: color || '#E0E0E0', border: color ? 'none' : '4px dashed #BDBDBD' }} />
+  if (type === 'square') return <div style={{ ...base, borderRadius: 16, background: color || '#E0E0E0', border: color ? 'none' : '4px dashed #BDBDBD' }} />
+  if (type === 'diamond') return <div style={{ ...base, background: color || '#E0E0E0', border: color ? 'none' : '4px dashed #BDBDBD', borderRadius: 12, transform: 'rotate(45deg)' }} />
+  if (type === 'star') return <div style={{ ...base, fontSize: size * 0.85, lineHeight: 1, background: 'transparent', border: 'none', filter: color ? 'none' : 'grayscale(1) brightness(1.5)', color: color || '#BDBDBD' }}>★</div>
+  if (type === 'heart') return <div style={{ ...base, fontSize: size * 0.75, lineHeight: 1, background: 'transparent', border: 'none', filter: color ? 'none' : 'grayscale(1) brightness(1.5)', color: color || '#BDBDBD' }}>♥</div>
+  if (type === 'triangle') {
+    if (color) return <div style={{ ...base, width: 0, height: 0, background: 'transparent', borderLeft: `${size/2}px solid transparent`, borderRight: `${size/2}px solid transparent`, borderBottom: `${size}px solid ${color}` }} />
+    return <div style={{ ...base, fontSize: size * 0.85, lineHeight: 1, background: 'transparent', border: 'none', color: '#BDBDBD' }}>△</div>
+  }
+  return <div style={{ ...base, background: color || '#E0E0E0', borderRadius: '50%' }} />
+}
+
+function SplashPaintBucket({ color, onClick, shaking }) {
+  return (
+    <button onClick={onClick} style={{
+      width: 72, height: 88, border: 'none', background: 'transparent', cursor: 'pointer',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 0,
+      animation: shaking ? 'csSplashShake 0.5s ease' : 'none',
+      WebkitTapHighlightColor: 'transparent',
+    }} aria-label={`${color.name} paint bucket`}>
+      <div style={{ width: 50, height: 12, borderRadius: '0 0 12px 12px', background: color.hex, marginBottom: -2, position: 'relative', zIndex: 1 }}>
+        <div style={{ position: 'absolute', bottom: -6, left: 8, width: 8, height: 8, borderRadius: '50%', background: color.hex }} />
+      </div>
+      <div style={{
+        width: 56, height: 52, borderRadius: '6px 6px 14px 14px', background: color.hex,
+        border: '3px solid rgba(0,0,0,0.15)', position: 'relative',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.2), inset 0 -8px 12px rgba(0,0,0,0.15)',
+      }}>
+        <div style={{ position: 'absolute', top: 6, left: 6, width: 10, height: 20, borderRadius: 6, background: 'rgba(255,255,255,0.35)' }} />
+        <div style={{ position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)', width: 36, height: 18, borderRadius: '18px 18px 0 0', border: '3px solid rgba(0,0,0,0.25)', borderBottom: 'none', background: 'transparent' }} />
+      </div>
+      <div style={{ marginTop: 4, fontSize: 12, fontWeight: 700, color: '#555', textTransform: 'capitalize' }}>{color.name}</div>
+    </button>
+  )
+}
+
+function SplashDroplets({ color, active }) {
+  if (!active) return null
+  const droplets = []
+  for (let i = 0; i < 8; i++) {
+    const angle = (360 / 8) * i
+    const dist = 60 + Math.random() * 40
+    const size = 12 + Math.random() * 16
+    droplets.push(
+      <div key={i} style={{
+        position: 'absolute', width: size, height: size, borderRadius: '50%', background: color,
+        top: '50%', left: '50%', marginTop: -size/2, marginLeft: -size/2,
+        animation: `csSplashDrop 0.7s ${i * 0.04}s ease-out forwards`, opacity: 0,
+        '--splash-x': `${Math.cos((angle * Math.PI) / 180) * dist}px`,
+        '--splash-y': `${Math.sin((angle * Math.PI) / 180) * dist}px`,
+      }} />
+    )
+  }
+  return <>{droplets}</>
+}
+
+const splashStyleTag = `
+@keyframes csSplashDrop {
+  0% { transform: translate(0,0) scale(0); opacity: 1; }
+  60% { opacity: 1; }
+  100% { transform: translate(var(--splash-x), var(--splash-y)) scale(1.3); opacity: 0; }
+}
+@keyframes csSplashShake {
+  0%,100% { transform: translateX(0); }
+  15% { transform: translateX(-8px); }
+  30% { transform: translateX(8px); }
+  45% { transform: translateX(-6px); }
+  60% { transform: translateX(6px); }
+  75% { transform: translateX(-3px); }
+  90% { transform: translateX(3px); }
+}
+@keyframes csSplashBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.25); }
+  50% { transform: scale(0.9); }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+@keyframes csSplashFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+`
+
+function ColorSplashMode({ onBack, t, lang }) {
+  const [round, setRound] = useState(0)
+  const [score, setScore] = useState(0)
+  const [roundData, setRoundData] = useState(null)
+  const [splashedColor, setSplashedColor] = useState(null)
+  const [splashActive, setSplashActive] = useState(false)
+  const [shakingBucket, setShakingBucket] = useState(null)
+  const [bouncing, setBouncing] = useState(false)
+  const [gameOver, setGameOver] = useState(false)
+  const [feedback, setFeedback] = useState(null)
+  const [canTap, setCanTap] = useState(true)
+  const timeoutRef = useRef(null)
+  const hasSpoken = useRef(false)
+
+  const startRound = useCallback(() => {
+    const data = generateSplashRound()
+    setRoundData(data)
+    setSplashedColor(null); setSplashActive(false)
+    setShakingBucket(null); setBouncing(false)
+    setFeedback(null); setCanTap(true)
+    hasSpoken.current = false
+  }, [])
+
+  useEffect(() => {
+    startRound()
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current) }
+  }, [round, startRound])
+
+  useEffect(() => {
+    if (roundData && !hasSpoken.current && !gameOver) {
+      hasSpoken.current = true
+      const timer = setTimeout(() => { speakPrompt(roundData.target.name, lang) }, 400)
+      return () => clearTimeout(timer)
+    }
+  }, [roundData, lang, gameOver])
+
+  const handleBucketTap = (color) => {
+    if (!canTap || !roundData) return
+    if (color.name === roundData.target.name) {
+      setCanTap(false); setSplashedColor(color.hex); setSplashActive(true)
+      setBouncing(true); setFeedback('correct')
+      setScore(s => s + 1); playCorrectSound(color.name, lang)
+      timeoutRef.current = setTimeout(() => {
+        if (round + 1 >= SPLASH_TOTAL_ROUNDS) { playLevelUpSound(lang); setGameOver(true) }
+        else setRound(r => r + 1)
+      }, 1500)
+    } else {
+      setShakingBucket(color.name); setFeedback('wrong')
+      playWrongSound(roundData.target.name, lang)
+      timeoutRef.current = setTimeout(() => { setShakingBucket(null); setFeedback(null) }, 700)
+    }
+  }
+
+  const handlePlayAgain = () => { setRound(0); setScore(0); setGameOver(false); setRoundData(null) }
+
+  if (gameOver) {
+    const stars = score >= 9 ? '🌟🌟🌟' : score >= 7 ? '🌟🌟' : score >= 5 ? '🌟' : '💪'
+    const msg = score >= 9 ? (t?.amazing || 'Amazing!') : score >= 7 ? (t?.great || 'Great job!') : score >= 5 ? (t?.good || 'Good work!') : (t?.keepTrying || 'Keep trying!')
+    return (
+      <div className="result-screen">
+        <style>{splashStyleTag}</style>
+        <div className="result-emoji" style={{ fontSize: '56px' }}>{stars}</div>
+        <div className="result-score" style={{ fontSize: '2rem' }}>{score} / {SPLASH_TOTAL_ROUNDS}</div>
+        <div className="result-message">{msg}</div>
+        <button className="play-again-btn" onClick={handlePlayAgain}>{t.playAgain}</button>
+        <br /><br />
+        <button className="play-again-btn" style={{ background: '#aaa' }} onClick={onBack}>{t.home}</button>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '60vh', position: 'relative', overflow: 'hidden' }}>
+      <style>{splashStyleTag}</style>
+      <div style={{ textAlign: 'center', padding: '4px 0', fontSize: 14, fontWeight: 600, color: '#999' }}>
+        {t.roundXofY ? t.roundXofY(round + 1, SPLASH_TOTAL_ROUNDS) : `Round ${round + 1} / ${SPLASH_TOTAL_ROUNDS}`}
+      </div>
+      <div style={{ textAlign: 'center', fontSize: '0.9rem', color: '#4CAF50', fontWeight: '600' }}>⭐ {score}</div>
+
+      {roundData && (
+        <div style={{ textAlign: 'center', padding: '12px 20px', animation: 'csSplashFadeIn 0.4s ease' }}>
+          <div style={{
+            display: 'inline-block', background: 'rgba(255,255,255,0.9)', borderRadius: 20,
+            padding: '10px 28px', fontSize: 20, fontWeight: 800, color: '#333',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          }}>
+            🎨 {t?.splashIt || 'Splash it'}{' '}
+            <span style={{ color: roundData.target.hex, textTransform: 'uppercase' }}>{roundData.target.name}</span>!
+          </div>
+        </div>
+      )}
+
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', minHeight: '200px' }}>
+        {roundData && (
+          <div style={{ position: 'relative', animation: bouncing ? 'csSplashBounce 0.6s ease' : 'none' }}>
+            <SplashDroplets color={splashedColor} active={splashActive} />
+            <SplashShapeRenderer type={roundData.shape.type} size={140} color={splashedColor} style={{}} />
+            {feedback === 'correct' && <div style={{ position: 'absolute', top: -30, right: -20, fontSize: 36, animation: 'csSplashBounce 0.5s ease' }}>✅</div>}
+            {feedback === 'wrong' && <div style={{ position: 'absolute', top: -30, right: -20, fontSize: 36, animation: 'csSplashShake 0.5s ease' }}>❌</div>}
+          </div>
+        )}
+      </div>
+
+      {roundData && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, padding: '20px 16px 36px', flexWrap: 'wrap' }}>
+          {roundData.options.map((color) => (
+            <SplashPaintBucket key={color.name} color={color} shaking={shakingBucket === color.name} onClick={() => handleBucketTap(color)} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============ COLOR MIXING MODE ============
+const MIX_COLOR_MAP = {
+  red: '#f44336', blue: '#2196F3', yellow: '#FFEB3B', white: '#f5f5f5',
+  black: '#333333', purple: '#9C27B0', orange: '#FF9800', green: '#4CAF50',
+  pink: '#E91E63', gray: '#9E9E9E',
+}
+
+const MIXES = [
+  { c1: 'red', c2: 'blue', result: 'purple', distractors: ['orange', 'green', 'pink'] },
+  { c1: 'red', c2: 'yellow', result: 'orange', distractors: ['purple', 'green', 'pink'] },
+  { c1: 'blue', c2: 'yellow', result: 'green', distractors: ['purple', 'orange', 'pink'] },
+  { c1: 'red', c2: 'white', result: 'pink', distractors: ['purple', 'orange', 'gray'] },
+  { c1: 'black', c2: 'white', result: 'gray', distractors: ['purple', 'pink', 'green'] },
+]
+
+const MIX_TOTAL_ROUNDS = 8
+
+function ColorMixingMode({ onBack, t, lang }) {
+  const [round, setRound] = useState(0)
+  const [score, setScore] = useState(0)
+  const [mix, setMix] = useState(null)
+  const [options, setOptions] = useState([])
+  const [feedback, setFeedback] = useState(null)
+  const [selected, setSelected] = useState(null)
+  const [mixing, setMixing] = useState(false)
+  const [gameOver, setGameOver] = useState(false)
+  const mounted = useRef(true)
+
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false } }, [])
+
+  const generateMixRound = useCallback(() => {
+    const m = MIXES[Math.floor(Math.random() * MIXES.length)]
+    const opts = shuffle([m.result, ...shuffle(m.distractors).slice(0, 2)])
+    setMix(m); setOptions(opts); setFeedback(null); setSelected(null); setMixing(true)
+    setTimeout(() => { if (mounted.current) setMixing(false) }, 1500)
+    speakPrompt(`${m.c1} plus ${m.c2} makes what color?`, lang).catch(() => {})
+  }, [lang])
+
+  useEffect(() => { if (!gameOver) generateMixRound() }, [round, gameOver, generateMixRound])
+
+  const handlePick = useCallback((color) => {
+    if (feedback !== null || mixing) return
+    setSelected(color)
+    if (color === mix.result) {
+      setFeedback('correct'); setScore(s => s + 1); playCorrectSound(color, lang)
+      setTimeout(() => {
+        if (!mounted.current) return
+        if (round + 1 >= MIX_TOTAL_ROUNDS) { playLevelUpSound(lang); setGameOver(true) }
+        else setRound(r => r + 1)
+      }, 1800)
+    } else {
+      setFeedback('wrong'); playWrongSound(color, lang)
+      setTimeout(() => {
+        if (!mounted.current) return
+        if (round + 1 >= MIX_TOTAL_ROUNDS) setGameOver(true)
+        else setRound(r => r + 1)
+      }, 2000)
+    }
+  }, [feedback, mixing, mix, lang, round])
+
+  const restart = () => { setRound(0); setScore(0); setGameOver(false) }
+
+  if (gameOver) {
+    const emoji = score >= 7 ? '🎨' : score >= 4 ? '🌈' : '💪'
+    const msg = score >= 7 ? 'Color master!' : score >= 4 ? 'Great mixing!' : 'Keep exploring colors!'
+    return (
+      <div className="result-screen">
+        <div className="result-emoji" style={{ fontSize: '80px' }}>{emoji}</div>
+        <div className="result-score" style={{ fontSize: '2rem' }}>{score} / {MIX_TOTAL_ROUNDS}</div>
+        <div className="result-message">{msg}</div>
+        <button className="play-again-btn" onClick={restart}>{t.playAgain}</button>
+        <br /><br />
+        <button className="play-again-btn" style={{ background: '#aaa' }} onClick={onBack}>{t.home}</button>
+      </div>
+    )
+  }
+
+  if (!mix) return null
+
+  return (
+    <>
+      <div style={{ textAlign: 'center', fontSize: '18px', color: '#777', margin: '8px 0' }}>
+        {t.roundXofY ? t.roundXofY(round + 1, MIX_TOTAL_ROUNDS) : `Round ${round + 1} of ${MIX_TOTAL_ROUNDS}`}
+      </div>
+      <div style={{ textAlign: 'center', fontSize: '0.9rem', color: '#4CAF50', fontWeight: '600' }}>⭐ {score}</div>
+
+      <div style={{ textAlign: 'center', padding: '20px', position: 'relative' }}>
+        <div style={{ fontSize: '22px', fontWeight: 'bold', marginBottom: '16px', color: '#333' }}>
+          Mix the colors! 🎨
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: mixing ? '0px' : '20px', transition: 'gap 1s ease-in-out', margin: '20px 0' }}>
+          <div style={{
+            width: '100px', height: '100px', borderRadius: '50%', background: MIX_COLOR_MAP[mix.c1],
+            border: mix.c1 === 'white' ? '2px solid #ccc' : 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+            transition: 'transform 1s ease-in-out', transform: mixing ? 'translateX(30px) scale(0.9)' : 'translateX(0) scale(1)', zIndex: 1,
+          }} />
+          <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#555', opacity: mixing ? 0 : 1, transition: 'opacity 0.5s', width: mixing ? '0' : 'auto' }}>+</div>
+          <div style={{
+            width: '100px', height: '100px', borderRadius: '50%', background: MIX_COLOR_MAP[mix.c2],
+            border: mix.c2 === 'white' ? '2px solid #ccc' : 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+            transition: 'transform 1s ease-in-out', transform: mixing ? 'translateX(-30px) scale(0.9)' : 'translateX(0) scale(1)', zIndex: 1,
+          }} />
+        </div>
+
+        {!mixing && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '16px 0' }}>
+            <div style={{
+              width: '80px', height: '80px', borderRadius: '50%',
+              background: feedback === 'correct' ? MIX_COLOR_MAP[mix.result] : 'linear-gradient(135deg, #ddd, #bbb)',
+              boxShadow: feedback === 'correct' ? `0 0 30px ${MIX_COLOR_MAP[mix.result]}` : '0 4px 10px rgba(0,0,0,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px', color: '#fff',
+            }}>
+              {feedback === 'correct' ? '✨' : '❓'}
+            </div>
+          </div>
+        )}
+
+        <div style={{ fontSize: '20px', color: '#555', margin: '8px 0' }}>
+          <span style={{ fontWeight: 'bold', color: MIX_COLOR_MAP[mix.c1], textShadow: mix.c1 === 'yellow' ? '0 0 2px #999' : 'none' }}>{mix.c1}</span>
+          {' + '}
+          <span style={{ fontWeight: 'bold', color: MIX_COLOR_MAP[mix.c2], textShadow: mix.c2 === 'white' ? '0 0 2px #999' : 'none' }}>{mix.c2}</span>
+          {' = ?'}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', padding: '0 20px' }}>
+        {options.map((color, idx) => {
+          let border = '3px solid #ddd'
+          let transform = 'scale(1)'
+          if (selected === color && feedback === 'correct') { border = '4px solid #4CAF50'; transform = 'scale(1.1)' }
+          if (selected === color && feedback === 'wrong') { border = '4px solid #f44336' }
+          if (feedback === 'wrong' && color === mix.result) { border = '4px solid #4CAF50' }
+          return (
+            <button key={idx} onClick={() => handlePick(color)} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+              padding: '14px 20px', borderRadius: '20px', background: '#fff',
+              border, cursor: 'pointer', transition: 'transform 0.2s', transform, minWidth: '90px',
+            }}>
+              <div style={{
+                width: '50px', height: '50px', borderRadius: '50%', background: MIX_COLOR_MAP[color],
+                border: color === 'white' ? '2px solid #ccc' : 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              }} />
+              <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#555', textTransform: 'capitalize' }}>{color}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      {feedback && (
+        <div style={{
+          textAlign: 'center', fontSize: '22px', margin: '16px', padding: '12px',
+          borderRadius: '16px', fontWeight: 'bold',
+          background: feedback === 'correct' ? '#e8f5e9' : '#fce4ec',
+          color: feedback === 'correct' ? '#2e7d32' : '#c62828',
+        }}>
+          {feedback === 'correct' ? `✅ ${mix.c1} + ${mix.c2} = ${mix.result}!` : `❌ It makes ${mix.result}!`}
+        </div>
+      )}
+    </>
+  )
+}
+
 // ============ MAIN COMPONENT ============
 export default function LearnColors({ onBack }) {
   const { t, lang } = useLanguage()
   const [diffLevel, setDiffLevel] = useState(null)
 
   const DIFFICULTIES = [
-    { key: 'easy', label: '🟢', emoji: '🔊', desc: t.easyColorDesc || 'Voice guides you! Hear the color, then tap it.' },
-    { key: 'medium', label: '🟡', emoji: '🎈', desc: t.popColorsDesc || 'Pop the right color balloons!' },
-    { key: 'hard', label: '🔴', emoji: '🧠', desc: t.memoryMatchDesc || 'Find matching color pairs!' },
+    { key: 'easy', label: '🔊 Learn Colors', emoji: '🔊', desc: t.easyColorDesc || 'Voice guides you! Hear the color, then tap it.' },
+    { key: 'medium', label: '🎈 Balloon Pop', emoji: '🎈', desc: t.popColorsDesc || 'Pop the right color balloons!' },
+    { key: 'hard', label: '🧠 Memory Match', emoji: '🧠', desc: t.memoryMatchDesc || 'Find matching color pairs!' },
+    { key: 'splash', label: '🎨 Color Splash', emoji: '🎨', desc: t.colorSplashDesc || 'Splash shapes with the right color!' },
+    { key: 'mixing', label: '🌈 Color Mixing', emoji: '🌈', desc: t.colorMixingDesc || 'Mix two colors to make a new one!' },
   ]
 
   // Difficulty selection screen
@@ -556,25 +957,32 @@ export default function LearnColors({ onBack }) {
           <div style={{ fontSize: '1rem', color: '#555', marginBottom: '20px' }}>
             {t.chooseDifficulty || 'Choose difficulty:'}
           </div>
-          {DIFFICULTIES.map((d, i) => (
-            <button key={d.key} onClick={() => setDiffLevel(i)} style={{
-              display: 'flex', alignItems: 'center', gap: '12px',
-              width: '90%', margin: '10px auto', padding: '16px',
-              borderRadius: '16px', border: 'none',
-              background: i === 0 ? 'linear-gradient(135deg, #4CAF50, #66BB6A)' :
-                         i === 1 ? 'linear-gradient(135deg, #FF9800, #FFB74D)' :
-                         'linear-gradient(135deg, #f44336, #EF5350)',
-              color: '#fff', fontSize: '1rem', fontWeight: '700',
-              cursor: 'pointer', boxShadow: '0 3px 12px rgba(0,0,0,0.15)',
-              textAlign: 'left',
-            }}>
-              <span style={{ fontSize: '2rem' }}>{d.emoji}</span>
-              <div>
-                <div>{d.label} {t[d.key]}</div>
-                <div style={{ fontSize: '0.75rem', fontWeight: '400', opacity: 0.9, marginTop: '2px' }}>{d.desc}</div>
-              </div>
-            </button>
-          ))}
+          {DIFFICULTIES.map((d, i) => {
+            const bgs = [
+              'linear-gradient(135deg, #4CAF50, #66BB6A)',
+              'linear-gradient(135deg, #FF9800, #FFB74D)',
+              'linear-gradient(135deg, #f44336, #EF5350)',
+              'linear-gradient(135deg, #E91E63, #F06292)',
+              'linear-gradient(135deg, #9C27B0, #BA68C8)',
+            ]
+            return (
+              <button key={d.key} onClick={() => setDiffLevel(i)} style={{
+                display: 'flex', alignItems: 'center', gap: '12px',
+                width: '90%', margin: '10px auto', padding: '14px',
+                borderRadius: '16px', border: 'none',
+                background: bgs[i] || bgs[0],
+                color: '#fff', fontSize: '1rem', fontWeight: '700',
+                cursor: 'pointer', boxShadow: '0 3px 12px rgba(0,0,0,0.15)',
+                textAlign: 'left',
+              }}>
+                <span style={{ fontSize: '2rem' }}>{d.emoji}</span>
+                <div>
+                  <div>{d.label}</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: '400', opacity: 0.9, marginTop: '2px' }}>{d.desc}</div>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
     )
@@ -591,6 +999,8 @@ export default function LearnColors({ onBack }) {
       {diffLevel === 0 && <EasyMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
       {diffLevel === 1 && <MediumMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
       {diffLevel === 2 && <HardMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
+      {diffLevel === 3 && <ColorSplashMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
+      {diffLevel === 4 && <ColorMixingMode onBack={() => setDiffLevel(null)} t={t} lang={lang} />}
     </div>
   )
 }
