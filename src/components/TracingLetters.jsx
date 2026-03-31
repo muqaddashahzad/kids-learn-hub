@@ -65,7 +65,7 @@ export default function TracingLetters({ onBack }) {
   const canvasSize = Math.min(320, typeof window !== 'undefined' ? window.innerWidth - 40 : 320);
 
   useEffect(() => {
-    speakName(letter, lang).catch(() => {});
+    speakName(letter, lang);
     setStrokeCount(0);
     setShowDone(false);
   }, [letter, lang]);
@@ -150,7 +150,7 @@ export default function TracingLetters({ onBack }) {
   };
 
   const speakCurrent = () => {
-    speakName(`${letter} for ${hint.word}`, lang).catch(() => {});
+    speakName(`${letter} for ${hint.word}`, lang);
   };
 
   return (

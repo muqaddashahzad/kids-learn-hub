@@ -53,7 +53,7 @@ export default function WordBuilder({ onBack }) {
       setTiles(shuffleArray(letters));
       setPlaced([]);
       setCompleted(false);
-      speakName(currentWord.word, lang).catch(() => {});
+      speakName(currentWord.word, lang);
     }
   }, [wordIndex, gameOver, lang, order]);
 
@@ -73,7 +73,7 @@ export default function WordBuilder({ onBack }) {
       if (newPlaced.length === currentWord.word.length) {
         setCompleted(true);
         playCorrectSound(currentWord.word, lang);
-        speakName(currentWord.word, lang).catch(() => {});
+        speakName(currentWord.word, lang);
         setScore(s => s + 1);
 
         setTimeout(() => {
