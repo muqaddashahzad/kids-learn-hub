@@ -94,7 +94,12 @@ function EasyMode({ categoryKey, onBack, t, lang }) {
     setDisabled(true); setSelected(opt.name)
     const name = getItemName(t, categoryKey, current)
     // Play real animal sound when kid taps ANY animal option
-    if (isAnimal) playAnimalSound(opt.name)
+    if (isAnimal) {
+      playAnimalSound(opt.name)
+      if (opt.name !== current.name) {
+        setTimeout(() => playAnimalSound(current.name), 1000)
+      }
+    }
     if (opt.name === current.name) {
       setScore(s => s + 1); setFeedback(t.correct)
       playCorrectSound(name, lang)
@@ -200,7 +205,12 @@ function MediumMode({ categoryKey, onBack, t, lang }) {
     if (disabled) return
     setDisabled(true); setSelected(opt.name)
     const name = getItemName(t, categoryKey, current)
-    if (isAnimal) playAnimalSound(opt.name)
+    if (isAnimal) {
+      playAnimalSound(opt.name)
+      if (opt.name !== current.name) {
+        setTimeout(() => playAnimalSound(current.name), 1000)
+      }
+    }
     if (opt.name === current.name) {
       setScore(s => s + 1); setFeedback(t.correct)
       playCorrectSound(name, lang)
@@ -328,7 +338,12 @@ function HardMode({ categoryKey, onBack, t, lang }) {
     setDisabled(true); setSelected(opt.name)
     clearTimeout(timerRef.current)
     const name = getItemName(t, categoryKey, current)
-    if (isAnimal) playAnimalSound(opt.name)
+    if (isAnimal) {
+      playAnimalSound(opt.name)
+      if (opt.name !== current.name) {
+        setTimeout(() => playAnimalSound(current.name), 1000)
+      }
+    }
     if (opt.name === current.name) {
       const bonus = timer >= 7 ? 3 : timer >= 4 ? 2 : 1
       setScore(s => s + bonus); setFeedback(`${t.correct} +${bonus}`)

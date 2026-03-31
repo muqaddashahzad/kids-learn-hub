@@ -29,10 +29,15 @@ const SOUND_MAP = {
   Pig: 'pig',
   Frog: 'frog',
   Bird: 'bird',
-  Fish: 'fish',
   Monkey: 'monkey',
   Bear: 'bear',
   Rabbit: 'rabbit',
+  Goat: 'goat',
+  Camel: 'camel',
+  Parrot: 'parrot',
+  Peacock: 'peacock',
+  Buffalo: 'buffalo',
+  Tiger: 'tiger',
 }
 
 // Preload all sounds on first user interaction

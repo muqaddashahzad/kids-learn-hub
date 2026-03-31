@@ -14,6 +14,9 @@ import OddOneOut from './components/OddOneOut'
 import SimpleMath from './components/SimpleMath'
 import ColorMixing from './components/ColorMixing'
 import MatchPairs from './components/MatchPairs'
+import FeedMonster from './components/FeedMonster'
+import MatchShadow from './components/MatchShadow'
+import ColorSplash from './components/ColorSplash'
 import './App.css'
 
 function App() {
@@ -45,6 +48,9 @@ function App() {
         {screen === 'math' && <SimpleMath onBack={back} />}
         {screen === 'color-mixing' && <ColorMixing onBack={back} />}
         {screen === 'match-pairs' && <MatchPairs onBack={back} />}
+        {screen === 'feed-monster' && <FeedMonster onBack={back} />}
+        {screen === 'match-shadow' && <MatchShadow onBack={back} />}
+        {screen === 'color-splash' && <ColorSplash onBack={back} />}
       </div>
     </LanguageProvider>
   )

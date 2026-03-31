@@ -389,8 +389,8 @@ export default function BalloonPop({ mode, onBack }) {
               left: b.x,
               top: b.y,
               // Extra 20px padding for easier tapping by kids
-              padding: '20px',
-              margin: '-20px',
+              padding: '10px',
+              margin: '-10px',
               cursor: 'pointer',
               transition: b.popped ? 'transform 0.3s, opacity 0.3s' : 'none',
               transform: b.popped ? 'scale(1.5)' : 'scale(1)',
