@@ -400,9 +400,11 @@ const SPLASH_SHAPES = [
 
 const SPLASH_TOTAL_ROUNDS = 10
 
-function generateSplashRound() {
-  const target = SPLASH_COLORS[Math.floor(Math.random() * SPLASH_COLORS.length)]
-  const shape = SPLASH_SHAPES[Math.floor(Math.random() * SPLASH_SHAPES.length)]
+function generateSplashRound(colorQueue, shapeQueue) {
+  if (colorQueue.length === 0) colorQueue.push(...shuffle([...SPLASH_COLORS]))
+  if (shapeQueue.length === 0) shapeQueue.push(...shuffle([...SPLASH_SHAPES]))
+  const target = colorQueue.pop()
+  const shape = shapeQueue.pop()
   const others = SPLASH_COLORS.filter(c => c.name !== target.name)
   const shuffledOthers = shuffle(others).slice(0, 3)
   const options = shuffle([target, ...shuffledOthers])
@@ -513,9 +515,11 @@ function ColorSplashMode({ onBack, t, lang }) {
   const [canTap, setCanTap] = useState(true)
   const timeoutRef = useRef(null)
   const hasSpoken = useRef(false)
+  const splashColorQueue = useRef(shuffle([...SPLASH_COLORS]))
+  const splashShapeQueue = useRef(shuffle([...SPLASH_SHAPES]))
 
   const startRound = useCallback(() => {
-    const data = generateSplashRound()
+    const data = generateSplashRound(splashColorQueue.current, splashShapeQueue.current)
     setRoundData(data)
     setSplashedColor(null); setSplashActive(false)
     setShakingBucket(null); setBouncing(false)
@@ -627,6 +631,11 @@ const MIXES = [
   { c1: 'blue', c2: 'yellow', result: 'green', distractors: ['purple', 'orange', 'pink'] },
   { c1: 'red', c2: 'white', result: 'pink', distractors: ['purple', 'orange', 'gray'] },
   { c1: 'black', c2: 'white', result: 'gray', distractors: ['purple', 'pink', 'green'] },
+  { c1: 'blue', c2: 'white', result: 'pink', distractors: ['purple', 'gray', 'green'] },
+  { c1: 'yellow', c2: 'red', result: 'orange', distractors: ['green', 'purple', 'gray'] },
+  { c1: 'blue', c2: 'red', result: 'purple', distractors: ['pink', 'gray', 'orange'] },
+  { c1: 'yellow', c2: 'blue', result: 'green', distractors: ['gray', 'pink', 'orange'] },
+  { c1: 'white', c2: 'black', result: 'gray', distractors: ['pink', 'green', 'orange'] },
 ]
 
 const REVERSE_MIXES = {
@@ -655,7 +664,7 @@ const cmSplitStyles = `
 }
 `
 
-const MIX_TOTAL_ROUNDS = 8
+const MIX_TOTAL_ROUNDS = 10
 
 function ColorMixingMode({ onBack, t, lang }) {
   const [round, setRound] = useState(0)
@@ -667,22 +676,24 @@ function ColorMixingMode({ onBack, t, lang }) {
   const [mixing, setMixing] = useState(false)
   const [gameOver, setGameOver] = useState(false)
   const [splitAnim, setSplitAnim] = useState(null) // { color, parts: [c1, c2] }
+  const [shuffledMixes, setShuffledMixes] = useState(() => shuffle([...MIXES]))
   const [bonusColors, setBonusColors] = useState([])
   const mounted = useRef(true)
 
   useEffect(() => { mounted.current = true; return () => { mounted.current = false } }, [])
 
-  const generateMixRound = useCallback((bonus) => {
-    const m = MIXES[Math.floor(Math.random() * MIXES.length)]
+  const generateMixRound = useCallback((bonus, currentRound) => {
+    const m = shuffledMixes[currentRound !== undefined ? currentRound : round]
+    if (!m) return
     const pool = [...m.distractors, ...(bonus || [])]
     const uniquePool = [...new Set(pool)].filter(c => c !== m.result)
     const opts = shuffle([m.result, ...shuffle(uniquePool).slice(0, 2)])
     setMix(m); setOptions(opts); setFeedback(null); setSelected(null); setSplitAnim(null); setMixing(true)
     setTimeout(() => { if (mounted.current) setMixing(false) }, 1500)
     speakPrompt(`${m.c1} plus ${m.c2} makes what color?`, lang).catch(() => {})
-  }, [lang])
+  }, [lang, shuffledMixes, round])
 
-  useEffect(() => { if (!gameOver) generateMixRound(bonusColors) }, [round, gameOver]) // eslint-disable-line
+  useEffect(() => { if (!gameOver) generateMixRound(bonusColors, round) }, [round, gameOver]) // eslint-disable-line
 
   const handlePick = useCallback((color) => {
     if (feedback !== null || mixing) return
@@ -722,7 +733,7 @@ function ColorMixingMode({ onBack, t, lang }) {
     }
   }, [feedback, mixing, mix, lang, round])
 
-  const restart = () => { setRound(0); setScore(0); setGameOver(false); setBonusColors([]) }
+  const restart = () => { setRound(0); setScore(0); setGameOver(false); setBonusColors([]); setShuffledMixes(shuffle([...MIXES])) }
 
   if (gameOver) {
     const emoji = score >= 7 ? '🎨' : score >= 4 ? '🌈' : '💪'

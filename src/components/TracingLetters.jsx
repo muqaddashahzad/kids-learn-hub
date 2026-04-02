@@ -157,7 +157,7 @@ export default function TracingLetters({ onBack }) {
     <div className="game-screen">
       <div className="game-header">
         <button className="back-btn" onClick={onBack}>{t?.back || '←'}</button>
-        <h2 className="game-title">{t?.tracingLetters || 'Trace Letters'}</h2>
+        <h2 className="game-title">{t?.tracingLetters || 'Learn Writing'}</h2>
         <span style={{ fontSize: 14, color: '#888' }}>
           {letterIndex + 1}/26
         </span>

@@ -134,23 +134,23 @@ export default function FeedMonster({ onBack }) {
           </div>
           <div style={{ fontSize: 48, marginBottom: 8 }}>{stars}</div>
           <div style={styles.gameOverTitle}>
-            {t ? t('Great Job!') : 'Great Job!'}
+            Great Job!
           </div>
           <div style={styles.gameOverScore}>
             {score} / {TOTAL_ROUNDS}
           </div>
           <div style={{ fontSize: 18, color: '#666', marginBottom: 24 }}>
             {score >= 9
-              ? (t ? t('Amazing!') : 'Amazing! 🎉')
+              ? 'Amazing! 🎉'
               : score >= 7
-              ? (t ? t('Well done!') : 'Well done! 👏')
-              : (t ? t('Keep practicing!') : 'Keep practicing! 💪')}
+              ? 'Well done! 👏'
+              : 'Keep practicing! 💪'}
           </div>
           <button style={styles.playAgainBtn} onClick={handlePlayAgain}>
-            {t ? t('Play Again') : '🔄 Play Again'}
+            🔄 Play Again
           </button>
           <button style={styles.backBtnLarge} onClick={onBack}>
-            {t ? t('Back') : '← Back'}
+            ← Back
           </button>
         </div>
         <style>{keyframes}</style>
@@ -165,7 +165,7 @@ export default function FeedMonster({ onBack }) {
       {/* Header */}
       <div style={styles.header}>
         <button style={styles.backBtn} onClick={onBack}>
-          ← {t ? t('Back') : 'Back'}
+          ← Back
         </button>
         <div style={styles.scoreBox}>
           ⭐ {score}/{TOTAL_ROUNDS}
@@ -192,7 +192,7 @@ export default function FeedMonster({ onBack }) {
         {/* Speech bubble */}
         <div style={styles.speechBubble}>
           <span style={{ fontSize: 20, fontWeight: 'bold' }}>
-            {t ? t('Feed me the') : 'Feed me the'}{' '}
+            Feed me the{' '}
             <span style={{ color: '#E91E63', fontSize: 24 }}>
               {target ? target.name : '...'}
             </span>

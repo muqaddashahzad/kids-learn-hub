@@ -183,20 +183,20 @@ export default function MatchShadow({ onBack }) {
         <div style={styles.gameOverBox}>
           <div style={{ fontSize: 60 }}>🏆</div>
           <div style={{ fontSize: 28, fontWeight: 'bold', marginTop: 12, color: '#333' }}>
-            {t ? t('Game Over!') : 'Game Over!'}
+            Game Over!
           </div>
           <div style={{ fontSize: 22, marginTop: 8, color: '#555' }}>
-            {t ? t('Score') : 'Score'}: {finalScore} / {maxScore}
+            Score: {finalScore} / {maxScore}
           </div>
           <div style={{ fontSize: 48, marginTop: 8 }}>
             {finalScore >= maxScore * 0.8 ? '🌟🌟🌟' : finalScore >= maxScore * 0.5 ? '🌟🌟' : '🌟'}
           </div>
           <div style={{ display: 'flex', gap: 16, marginTop: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
             <button onClick={handlePlayAgain} style={styles.actionBtn}>
-              🔄 {t ? t('Play Again') : 'Play Again'}
+              🔄 Play Again
             </button>
             <button onClick={onBack} style={{ ...styles.actionBtn, background: '#78909c' }}>
-              ◀ {t ? t('Back') : 'Back'}
+              ◀ Back
             </button>
           </div>
         </div>
@@ -208,23 +208,23 @@ export default function MatchShadow({ onBack }) {
     <div style={styles.container} ref={containerRef}>
       {/* Header */}
       <div style={styles.header}>
-        <button onClick={onBack} style={styles.backBtn}>◀ {t ? t('Back') : 'Back'}</button>
+        <button onClick={onBack} style={styles.backBtn}>◀ Back</button>
         <div style={styles.info}>
           <span style={{ marginRight: 16 }}>⭐ {score}</span>
-          <span>{t ? t('Round') : 'Round'} {round + 1}/{TOTAL_ROUNDS}</span>
+          <span>Round {round + 1}/{TOTAL_ROUNDS}</span>
         </div>
       </div>
 
       {/* Title */}
       <div style={styles.title}>
-        🔦 {t ? t('Match the Shadows!') : 'Match the Shadows!'}
+        🔦 Match the Shadows!
       </div>
 
       {/* Game area */}
       <div style={styles.gameArea}>
         {/* Objects - Left side */}
         <div style={styles.column}>
-          <div style={styles.columnLabel}>{t ? t('Objects') : 'Objects'}</div>
+          <div style={styles.columnLabel}>Objects</div>
           {roundItems.map((item, idx) => {
             const isMatched = matched.includes(item.name);
             const isDragging = dragging === idx;
@@ -253,7 +253,7 @@ export default function MatchShadow({ onBack }) {
 
         {/* Shadows - Right side */}
         <div style={styles.column}>
-          <div style={styles.columnLabel}>{t ? t('Shadows') : 'Shadows'}</div>
+          <div style={styles.columnLabel}>Shadows</div>
           {shadowOrder.map((item, si) => {
             const isMatched = matched.includes(item.name);
             const hasFeedback = feedback && feedback.shadowIdx === si;

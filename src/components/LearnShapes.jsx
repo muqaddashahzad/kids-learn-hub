@@ -36,7 +36,18 @@ function getOptions(correct, all, count = 4) {
   return shuffle([correct, ...picks])
 }
 
-function createShapeQueue() { return shuffle([...SHAPES]) }
+function createShapeQueue() {
+  // Double the pool so 10 rounds can all be unique (8 shapes + 2 extra from reshuffle)
+  const first = shuffle([...SHAPES])
+  const second = shuffle([...SHAPES])
+  // Make sure the first item of second batch isn't the last of first batch
+  if (second[second.length - 1]?.name === first[0]?.name) {
+    const tmp = second[second.length - 1]
+    second[second.length - 1] = second[0]
+    second[0] = tmp
+  }
+  return [...second, ...first]
+}
 
 // ============ EASY MODE: Classic shape quiz with color hint ============
 // ============ EASY MODE: Voice says "Choose [shape]" BEFORE child taps ============
@@ -384,10 +395,12 @@ function HardMode({ onBack, onComplete, t, lang }) {
   const [timer, setTimer] = useState(8)
   const [streak, setStreak] = useState(0)
   const timerRef = useRef(null)
+  const shapeQueue = useRef(createShapeQueue())
   const totalRounds = 12
 
   const initRound = useCallback(() => {
-    const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)]
+    if (shapeQueue.current.length === 0) shapeQueue.current = createShapeQueue()
+    const shape = shapeQueue.current.pop()
     setTargetShape(shape)
     // Create 4 silhouette options with random rotations and colors
     const opts = getOptions(shape, SHAPES, 4)

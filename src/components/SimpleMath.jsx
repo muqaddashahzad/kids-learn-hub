@@ -125,8 +125,8 @@ export default function SimpleMath({ onBack }) {
     return (
       <div className="game-screen">
         <div className="game-header">
-          <button className="back-btn" onClick={onBack} style={{ fontSize: '24px', background: 'none', border: 'none', cursor: 'pointer' }}>←</button>
-          <span className="game-title" style={{ fontSize: '24px', fontWeight: 'bold' }}>🔢 Simple Math</span>
+          <button className="back-btn" onClick={onBack}>←</button>
+          <span className="game-title">🧮 Simple Math</span>
         </div>
         <div style={{ textAlign: 'center', padding: '40px 20px' }}>
           <div style={{ fontSize: '60px', marginBottom: '20px' }}>🧮</div>
@@ -181,8 +181,8 @@ export default function SimpleMath({ onBack }) {
   return (
     <div className="game-screen">
       <div className="game-header">
-        <button className="back-btn" onClick={onBack} style={{ fontSize: '24px', background: 'none', border: 'none', cursor: 'pointer' }}>←</button>
-        <span className="game-title" style={{ fontSize: '22px', fontWeight: 'bold' }}>🔢 Math</span>
+        <button className="back-btn" onClick={onBack}>←</button>
+        <span className="game-title">🧮 Math</span>
         <span style={{ fontSize: '18px' }}>⭐ {score}/{round + 1}</span>
       </div>
 
